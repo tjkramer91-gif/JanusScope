@@ -10,7 +10,7 @@ import {
 export const DOCUMENT_CATALOG: Omit<DocumentAvailability, "available">[] = [
   { id: "gc-subcontract", label: "GC subcontract" },
   { id: "bid-proposal", label: "Subcontractor bid or proposal" },
-  { id: "scope-letter", label: "Scope letter" },
+  { id: "scope-letter", label: "Scope sheet" },
   { id: "exclusions-assumptions", label: "Assumptions and exclusions" },
   { id: "msa", label: "Master service agreement" },
   { id: "drawings", label: "Drawings" },
@@ -25,7 +25,7 @@ export const DOCUMENT_CATALOG: Omit<DocumentAvailability, "available">[] = [
   { id: "wage", label: "Wage requirements" },
   { id: "permit-ahj", label: "Permit or AHJ requirements" },
   { id: "prime-contract-excerpt", label: "Prime contract excerpt" },
-  { id: "other", label: "Other" },
+  { id: "other", label: "Other supporting document" },
 ];
 
 export const RISK_CATEGORY_LABELS: Record<RiskCategory, string> = {
@@ -77,10 +77,10 @@ export const YES_NO_NOT_SURE_LABELS = {
 
 export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   draft: "Draft",
-  "documents-uploaded": "Documents Uploaded",
+  "documents-uploaded": "Documents uploaded",
   processing: "Processing",
-  "questions-needed": "Questions Needed",
-  "report-ready": "Report Ready",
+  "questions-needed": "Review package saved",
+  "report-ready": "Report ready",
   failed: "Failed",
 };
 

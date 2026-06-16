@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteProjectAction, deleteReportsAction } from "@/app/app/actions";
+import { SubScopeMemory } from "@/components/SubScopeMemory";
 import { ContractComparisonTable } from "@/components/ContractComparisonTable";
 import { ExclusionCheckTable } from "@/components/ExclusionCheckTable";
 import { HiddenScopeTable } from "@/components/HiddenScopeTable";
@@ -13,6 +14,7 @@ import { SeverityBadge } from "@/components/SeverityBadge";
 import { generateRiskReview } from "@/lib/risk-engine";
 import { addAudit, getLatestReview, getProject } from "@/lib/server/store";
 import { requireUser } from "@/lib/server/auth";
+import { RISK_OUTPUT_AREAS } from "@/lib/subscope-content";
 
 export default async function ReportPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params;
@@ -31,10 +33,10 @@ export default async function ReportPage({ params }: { params: Promise<{ project
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <p className="eyebrow">Risk report</p>
+            <p className="eyebrow">Step 4</p>
             <SeverityBadge severity={review.overallRating} />
           </div>
-          <h1 className="mt-2 text-3xl font-semibold text-ink">{project.name}</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-ink">SubScope risk output</h1>
           <p className="mt-2 text-sm text-moss">
             Generated {new Date(review.generatedAt).toLocaleString()} · {review.issueLog.length} open issue log items
           </p>
@@ -47,14 +49,14 @@ export default async function ReportPage({ params }: { params: Promise<{ project
       <section className="card p-8 sm:p-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="section-title">Download center</h2>
-            <p className="mt-1 text-sm leading-6 text-moss">
-              Downloads are generated from the current web report. Production storage should use signed URLs.
-            </p>
+          <h2 className="section-title">Report actions</h2>
+          <p className="mt-1 text-sm leading-6 text-moss">
+              Export and delete controls are part of the product direction. The PDF action is a placeholder-style export for the current web report.
+          </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link className="button-primary" href={`/auth/login?mfa=1&returnTo=/app/projects/${project.id}/report/pdf`}>
-              Download PDF Risk Report
+              Export to PDF Placeholder
             </Link>
             <Link className="button-secondary" href={`/auth/login?mfa=1&returnTo=/app/projects/${project.id}/report/csv`}>
               Download CSV Issue Log
@@ -74,6 +76,25 @@ export default async function ReportPage({ params }: { params: Promise<{ project
       </section>
 
       <RiskSummary project={project} review={review} />
+
+      <section className="card p-8 sm:p-10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow">Risk output includes</p>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">Report-style review for pre-signing questions</h2>
+          </div>
+          <span className="rounded-full border border-line/60 bg-paper px-4 py-2 text-xs font-semibold text-moss">
+            Not legal advice
+          </span>
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          {RISK_OUTPUT_AREAS.map((area) => (
+            <div className="rounded-[20px] border border-line/60 bg-paper p-4 text-sm font-semibold text-ink" key={area}>
+              {area}
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="card overflow-hidden">
         <div className="border-b border-line/60 p-8 sm:p-10">
@@ -121,6 +142,20 @@ export default async function ReportPage({ params }: { params: Promise<{ project
         </ol>
       </section>
       <RecommendedRevisions revisions={review.recommendedRevisions} />
+      <section className="card p-8 sm:p-10">
+        <h2 className="section-title">Suggested qualifications and exclusions</h2>
+        <p className="mt-2 text-sm leading-6 text-moss">
+          Use these as drafting prompts for your proposal qualifications or GC clarification log. Have counsel review contract language before signing.
+        </p>
+        <div className="mt-5 grid gap-3">
+          {review.recommendedRevisions.slice(0, 5).map((revision) => (
+            <div className="rounded-[22px] border border-line/60 bg-paper p-5 text-sm leading-6 text-ink" key={revision}>
+              {revision}
+            </div>
+          ))}
+        </div>
+      </section>
+      <SubScopeMemory />
       <IssueLogTable issues={review.issueLog} />
     </div>
   );

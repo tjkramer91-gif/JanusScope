@@ -4,14 +4,14 @@ import { requireUser } from "@/lib/server/auth";
 import { getProject } from "@/lib/server/store";
 
 const STEPS = [
-  "Uploading documents",
-  "Extracting text",
-  "Classifying documents",
-  "Comparing contract to bid",
-  "Checking exclusions",
-  "Generating risk report",
-  "Creating PDF",
-  "Creating CSV issue log",
+  "Confirming project facts",
+  "Checking uploaded document types",
+  "Comparing GC subcontract to bid language",
+  "Checking scope against exclusions",
+  "Reviewing payment, notice, LD, indemnity, warranty, retainage, and flow-down terms",
+  "Generating clarification questions",
+  "Creating report-style risk output",
+  "Preparing export placeholders",
 ];
 
 export default async function ProcessingPage({ params }: { params: Promise<{ projectId: string }> }) {
@@ -24,10 +24,10 @@ export default async function ProcessingPage({ params }: { params: Promise<{ pro
   return (
     <div className="mx-auto max-w-[900px] space-y-8">
       <div>
-        <p className="eyebrow">Processing</p>
-        <h1 className="mt-2 text-3xl font-semibold text-ink">Ready to generate the risk report</h1>
+        <p className="eyebrow">Step 4</p>
+        <h1 className="mt-2 text-3xl font-semibold text-ink">Ready to generate risk output</h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-          Background jobs can replace this step later. For the MVP, the server action runs the deterministic review and saves structured JSON for the report.
+          Background document parsing can replace this step later. For now, SubScope runs a deterministic construction risk review from project facts, uploaded metadata, pasted text, and checklist answers.
         </p>
       </div>
 
@@ -39,14 +39,14 @@ export default async function ProcessingPage({ params }: { params: Promise<{ pro
             </span>
             <div>
               <p className="font-semibold text-ink">{step}</p>
-              <p className="mt-1 text-sm text-moss">Prepared for this review.</p>
+              <p className="mt-1 text-sm text-moss">Prepared for this SubScope review.</p>
             </div>
           </div>
         ))}
       </section>
 
       <form action={action} className="flex justify-end">
-        <button className="button-primary" type="submit">Run review</button>
+        <button className="button-primary" type="submit">Generate Risk Output</button>
       </form>
     </div>
   );

@@ -6,24 +6,50 @@ export default function NewProjectPage() {
     <form action={createProjectAction} className="mx-auto max-w-[1120px] space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">New Review</p>
-          <h1 className="mt-2 text-3xl font-semibold text-ink">Create project review</h1>
+          <p className="eyebrow">Step 1</p>
+          <h1 className="mt-2 text-3xl font-semibold text-ink">Create SubScope project</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-moss">
-            Start with the project facts needed for a subcontract-vs-bid comparison.
+            Capture the core facts needed to compare a GC subcontract against your bid and assumptions.
           </p>
         </div>
-        <button className="button-primary" type="submit">Create review</button>
+        <button className="button-primary" type="submit">Create Project</button>
       </div>
 
       <section className="card p-8 sm:p-10">
+        <div className="mb-8">
+          <h2 className="section-title">Project basics</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
+            These fields anchor the review package, report header, and signing deadline reminders.
+          </p>
+        </div>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <label className="md:col-span-2">
             <span className="field-label">Project name</span>
-            <input className="field" name="name" required />
+            <input className="field" name="name" required placeholder="Mesa Apartments Phase 2" />
+          </label>
+          <label>
+            <span className="field-label">GC name</span>
+            <input className="field" name="gcName" required placeholder="General contractor" />
+          </label>
+          <label>
+            <span className="field-label">Trade</span>
+            <input className="field" name="tradeType" required placeholder="Electrical, drywall, civil..." />
+          </label>
+          <label>
+            <span className="field-label">Contract amount</span>
+            <input className="field" name="contractAmount" min="0" step="100" type="number" placeholder="1250000" />
+          </label>
+          <label>
+            <span className="field-label">Bid date</span>
+            <input className="field" name="bidDate" type="date" />
+          </label>
+          <label>
+            <span className="field-label">Contract execution deadline</span>
+            <input className="field" name="executionDeadline" type="date" />
           </label>
           <label className="md:col-span-2">
-            <span className="field-label">Project address</span>
-            <input className="field" name="projectAddress" required />
+            <span className="field-label">Project location</span>
+            <input className="field" name="projectAddress" required placeholder="Street address or project site" />
           </label>
           <label>
             <span className="field-label">City</span>
@@ -38,29 +64,20 @@ export default function NewProjectPage() {
             <input className="field" name="zip" required />
           </label>
           <label>
-            <span className="field-label">Trade type</span>
-            <input className="field" name="tradeType" required placeholder="Electrical, drywall, civil..." />
-          </label>
-          <label>
-            <span className="field-label">GC name</span>
-            <input className="field" name="gcName" required />
-          </label>
-          <label>
             <span className="field-label">Owner name</span>
-            <input className="field" name="ownerName" />
+            <input className="field" name="ownerName" placeholder="Optional" />
           </label>
-          <label>
-            <span className="field-label">Contract amount</span>
-            <input className="field" name="contractAmount" min="0" step="100" type="number" />
-          </label>
-          <label>
-            <span className="field-label">Bid date</span>
-            <input className="field" name="bidDate" type="date" />
-          </label>
-          <label>
-            <span className="field-label">Proposed execution deadline</span>
-            <input className="field" name="executionDeadline" type="date" />
-          </label>
+        </div>
+      </section>
+
+      <section className="card p-8 sm:p-10">
+        <div className="mb-8">
+          <h2 className="section-title">Optional review context</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
+            Keep this light for now. These values help frame wage, MSA, and project-type risk without adding another setup step.
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <label>
             <span className="field-label">Project type</span>
             <select className="field" name="projectType" defaultValue="commercial">
@@ -68,25 +85,29 @@ export default function NewProjectPage() {
             </select>
           </label>
           <label>
-            <span className="field-label">Is there an MSA?</span>
+            <span className="field-label">Master service agreement</span>
             <select className="field" name="hasMasterServiceAgreement" defaultValue="not-sure">
               {Object.entries(MSA_STATUS_LABELS).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
             </select>
           </label>
           <label>
-            <span className="field-label">Public or private work?</span>
+            <span className="field-label">Public or private work</span>
             <select className="field" name="publicOrPrivate" defaultValue="not-sure">
               {Object.entries(PUBLIC_PRIVATE_LABELS).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
             </select>
           </label>
           <label>
-            <span className="field-label">Prevailing wage involved?</span>
+            <span className="field-label">Prevailing wage involved</span>
             <select className="field" name="prevailingWageStatus" defaultValue="not-sure">
               {Object.entries(YES_NO_NOT_SURE_LABELS).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
             </select>
           </label>
         </div>
       </section>
+
+      <div className="flex justify-end">
+        <button className="button-primary" type="submit">Create Project and Upload Documents</button>
+      </div>
     </form>
   );
 }
