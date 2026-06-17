@@ -22,6 +22,11 @@ import {
   saveUploadedFile,
   userFacingStoreError,
 } from "@/lib/server/store";
+import {
+  SOURCE_VERIFICATION_SAMPLE_DOCUMENTS,
+  sourceVerificationSampleProjectInput,
+  sourceVerificationSampleTextFields,
+} from "@/lib/source-verification-sample";
 import { DocumentId, IntakeAnswer, Project } from "@/lib/types";
 import { validateUploadFile } from "@/lib/upload-validation";
 import { projectInputSchema } from "@/lib/validation";
@@ -82,6 +87,56 @@ export async function createProjectAction(formData: FormData) {
   }
 
   redirect(`/app/projects/${project.id}/upload?created=1`);
+}
+
+export async function createSourceVerificationSampleProjectAction() {
+  const user = await requireUser();
+  let projectId = "";
+
+  try {
+    const project = await createProject(user, sourceVerificationSampleProjectInput());
+    const uploaded = [];
+
+    for (const document of SOURCE_VERIFICATION_SAMPLE_DOCUMENTS) {
+      const file = new File([document.content], document.name, { type: document.type });
+      const saved = await saveUploadedFile(user, project, file, document.documentId);
+      if (saved) uploaded.push(saved);
+    }
+
+    const reviewProject: Project = {
+      ...project,
+      ...sourceVerificationSampleTextFields(),
+      uploadedFiles: uploaded,
+      status: "documents-uploaded",
+      deleteDocumentsAfterReport: false,
+    };
+    reviewProject.documents = syncDocumentAvailability(reviewProject);
+
+    const review = generateRiskReview(reviewProject);
+    const completedProject = {
+      ...reviewProject,
+      status: "report-ready" as const,
+      riskScore: review.score,
+      riskLevel: review.riskLevel,
+    };
+    const analysisJson = buildRiskAnalysisJson(completedProject, review);
+    const intelligenceHistory = await listIntelligenceGraphs(user, { excludeProjectId: completedProject.id });
+    const intelligenceGraph = buildProjectIntelligenceGraph(completedProject, review, intelligenceHistory);
+    await saveReview(user, completedProject, analysisJson, intelligenceGraph);
+
+    projectId = completedProject.id;
+    logEvent("info", "verification_sample.created", {
+      userId: user.id,
+      projectId,
+      uploadedCount: uploaded.length,
+    });
+  } catch (error) {
+    logEvent("error", "verification_sample.create_failed", { userId: user.id, reason: errorMessage(error) });
+    redirect(`/app/dashboard?error=${encodedMessage(userFacingStoreError(error))}`);
+  }
+
+  revalidatePath("/app/dashboard");
+  redirect(`/app/projects/${projectId}/report?sample=1`);
 }
 
 export async function uploadDocumentsAction(projectId: string, formData: FormData) {

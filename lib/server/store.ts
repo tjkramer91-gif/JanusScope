@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { getCache } from "@vercel/functions";
 import { DOCUMENT_CATALOG, createEmptyProject } from "@/lib/catalogs";
+import { extractUploadedFileText } from "@/lib/document-extraction";
 import { errorMessage, logEvent } from "@/lib/server/logger";
 import { getSupabaseAdmin, hasSupabaseConfig } from "@/lib/server/supabase";
 import type { SessionUser } from "@/lib/server/auth";
@@ -154,10 +155,19 @@ function asString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
 }
 
+function optionalString(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
 function asNumberOrNull(value: unknown): number | null {
   if (value === null || value === undefined || value === "") return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function optionalNumber(value: unknown): number | undefined {
+  const parsed = asNumberOrNull(value);
+  return parsed === null ? undefined : parsed;
 }
 
 function asBoolean(value: unknown, fallback = false): boolean {
@@ -179,8 +189,14 @@ function uploadedFilesFromRows(rows: DbRow[]): UploadedFile[] {
     size: Number(row.file_size ?? 0),
     type: asString(row.file_type, "application/octet-stream"),
     documentId: asString(row.document_type, "other") as DocumentId,
+    documentCategory: optionalString(row.document_category) as UploadedFile["documentCategory"],
     storagePath: asString(row.storage_path),
     processingStatus: asString(row.processing_status, "classified") as UploadedFile["processingStatus"],
+    extractionStatus: asString(row.extraction_status, row.extracted_text ? "extracted" : "metadata-only") as UploadedFile["extractionStatus"],
+    extractionMessage: optionalString(row.extraction_message),
+    extractedText: optionalString(row.extracted_text),
+    reviewedSectionCount: optionalNumber(row.reviewed_section_count),
+    includedInReview: typeof row.included_in_review === "boolean" ? row.included_in_review : Boolean(row.extracted_text),
     uploadedAt: asString(row.created_at, now()),
   }));
 }
@@ -609,6 +625,8 @@ export async function saveUploadedFile(
   const fileId = id("doc");
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "-");
   const storagePath = `${workspace.organizationId}/${project.id}/${fileId}-${safeName}`;
+  const extracted = await extractUploadedFileText(file, documentId);
+  const processingStatus: UploadedFile["processingStatus"] = extracted.extractionStatus === "failed" ? "failed" : "classified";
 
   if (shouldUseSupabase()) {
     const client = getSupabaseAdmin();
@@ -636,12 +654,25 @@ export async function saveUploadedFile(
         document_type: documentId,
         storage_path: bucket ? storagePath : `metadata-only/${storagePath}`,
         file_size: file.size,
-        processing_status: "classified",
+        processing_status: processingStatus,
+        extracted_text: extracted.extractedText || null,
+        extraction_status: extracted.extractionStatus,
+        extraction_message: extracted.extractionMessage,
+        reviewed_section_count: extracted.reviewedSectionCount,
+        included_in_review: extracted.includedInReview,
+        document_category: extracted.documentCategory,
       })
       .select("*")
       .single();
     if (error) throw error;
-    logEvent("info", "upload.saved", { userId: workspace.userId, projectId: project.id, size: file.size, storage: "supabase" });
+    logEvent("info", "upload.saved", {
+      userId: workspace.userId,
+      projectId: project.id,
+      size: file.size,
+      extractionStatus: extracted.extractionStatus,
+      includedInReview: extracted.includedInReview,
+      storage: "supabase",
+    });
     return uploadedFilesFromRows([data as DbRow])[0];
   }
 
@@ -655,11 +686,24 @@ export async function saveUploadedFile(
     size: file.size,
     type: file.type || "application/octet-stream",
     documentId,
+    documentCategory: extracted.documentCategory,
     storagePath,
-    processingStatus: "classified" as const,
+    processingStatus,
+    extractionStatus: extracted.extractionStatus,
+    extractionMessage: extracted.extractionMessage,
+    extractedText: extracted.extractedText || undefined,
+    reviewedSectionCount: extracted.reviewedSectionCount,
+    includedInReview: extracted.includedInReview,
     uploadedAt: now(),
   };
-  logEvent("info", "upload.saved", { userId: workspace.userId, projectId: project.id, size: file.size, storage: "local" });
+  logEvent("info", "upload.saved", {
+    userId: workspace.userId,
+    projectId: project.id,
+    size: file.size,
+    extractionStatus: extracted.extractionStatus,
+    includedInReview: extracted.includedInReview,
+    storage: "local",
+  });
   return uploadedFile;
 }
 

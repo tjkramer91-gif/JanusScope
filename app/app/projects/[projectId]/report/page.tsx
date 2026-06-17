@@ -11,10 +11,12 @@ import { RecommendedRevisions } from "@/components/RecommendedRevisions";
 import { ReportNotesGrid } from "@/components/ReportNotesGrid";
 import { RiskSummary } from "@/components/RiskSummary";
 import { SeverityBadge } from "@/components/SeverityBadge";
+import { SourceVerificationReport } from "@/components/SourceVerificationReport";
 import { buildProjectIntelligenceGraph } from "@/lib/intelligence-graph";
 import { generateRiskReview } from "@/lib/risk-engine";
 import { addAudit, getProject, listIntelligenceGraphs } from "@/lib/server/store";
 import { requireUser } from "@/lib/server/auth";
+import { buildSourceVerification } from "@/lib/source-verification";
 import { RISK_OUTPUT_AREAS } from "@/lib/subscope-content";
 
 export default async function ReportPage({ params }: { params: Promise<{ projectId: string }> }) {
@@ -24,6 +26,7 @@ export default async function ReportPage({ params }: { params: Promise<{ project
   if (!project) notFound();
 
   const review = generateRiskReview(project);
+  const sourceVerification = buildSourceVerification(project);
   const intelligenceHistory = await listIntelligenceGraphs(user, { excludeProjectId: project.id });
   const intelligenceGraph = buildProjectIntelligenceGraph(project, review, intelligenceHistory);
   await addAudit(user, project.id, "report.viewed", {});
@@ -78,6 +81,7 @@ export default async function ReportPage({ params }: { params: Promise<{ project
       </section>
 
       <RiskSummary project={project} review={review} />
+      <SourceVerificationReport report={sourceVerification} />
       <ProjectIntelligenceGraph graph={intelligenceGraph} />
 
       <section className="card p-8 sm:p-10">

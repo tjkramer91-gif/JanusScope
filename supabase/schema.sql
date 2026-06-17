@@ -70,6 +70,11 @@ create table if not exists documents (
   storage_path text not null,
   file_size bigint not null,
   processing_status text not null default 'uploaded',
+  extraction_status text not null default 'metadata-only',
+  extraction_message text,
+  reviewed_section_count integer,
+  included_in_review boolean not null default false,
+  document_category text,
   extracted_text text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -108,6 +113,11 @@ alter table projects add column if not exists bid_text text not null default '';
 alter table projects add column if not exists exclusions_text text not null default '';
 alter table projects add column if not exists notes_text text not null default '';
 alter table projects add column if not exists delete_documents_after_report boolean not null default false;
+alter table documents add column if not exists extraction_status text not null default 'metadata-only';
+alter table documents add column if not exists extraction_message text;
+alter table documents add column if not exists reviewed_section_count integer;
+alter table documents add column if not exists included_in_review boolean not null default false;
+alter table documents add column if not exists document_category text;
 alter table reviews add column if not exists intelligence_graph jsonb;
 
 create table if not exists risk_issues (

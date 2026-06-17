@@ -32,7 +32,7 @@ export default async function UploadPage({
           <p className="eyebrow">Step 2</p>
           <h1 className="mt-2 text-3xl font-semibold text-ink">Upload SubScope documents</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-            Add the package you received from the GC and the documents you used to price the work. For now, uploads are stored and classified while pasted text drives the deterministic review.
+            Add the package you received from the GC and the documents you used to price the work. CSV uploads are text-extracted for source-backed review; PDF, Word, Excel, PNG, and JPG uploads are stored and tracked until deeper parsing is added.
           </p>
         </div>
         <Link className="button-secondary" href={`/app/projects/${project.id}/questions`}>
@@ -88,7 +88,7 @@ export default async function UploadPage({
         <section className="card p-8 sm:p-10">
           <h2 className="section-title">Key language for this review</h2>
           <p className="mt-2 text-sm leading-6 text-moss">
-            Paste the specific language you want checked. This keeps the MVP transparent and avoids implying full legal review or full document parsing.
+            Paste any key language that is not available in readable uploads. The report separates pasted context from uploaded source evidence.
           </p>
           <div className="mt-6 grid gap-6 lg:grid-cols-3">
             <label>
@@ -124,18 +124,19 @@ export default async function UploadPage({
       <section className="card overflow-hidden">
         <div className="border-b border-line/60 p-8 sm:p-10">
           <h2 className="section-title">Uploaded documents</h2>
-          <p className="mt-1 text-sm text-moss">Documents are tied to user, organization, project, storage path, and processing status.</p>
+          <p className="mt-1 text-sm text-moss">Documents are tied to user, organization, project, storage path, extraction status, and review inclusion.</p>
         </div>
         {project.uploadedFiles.length === 0 ? (
           <p className="p-8 text-sm text-moss">No documents uploaded yet.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-[980px] w-full text-left text-sm">
+            <table className="min-w-[1160px] w-full text-left text-sm">
               <thead className="bg-paper/70 text-xs uppercase text-moss">
                 <tr>
                   <th className="px-4 py-3 font-semibold">File</th>
                   <th className="px-4 py-3 font-semibold">Document type</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Extraction</th>
                   <th className="px-4 py-3 font-semibold">Size</th>
                   <th className="px-4 py-3 font-semibold">Uploaded</th>
                   <th className="px-4 py-3 font-semibold">Actions</th>
@@ -162,6 +163,10 @@ export default async function UploadPage({
                         </form>
                       </td>
                       <td className="px-4 py-4 capitalize text-moss">{file.processingStatus}</td>
+                      <td className="px-4 py-4 text-moss">
+                        <p className="font-semibold capitalize text-ink">{file.extractionStatus ?? "metadata-only"}</p>
+                        <p className="mt-1 max-w-xs text-xs leading-5">{file.includedInReview ? `${file.reviewedSectionCount ?? 0} rows included` : file.extractionMessage ?? "No extracted text included"}</p>
+                      </td>
                       <td className="px-4 py-4 text-moss">{formatFileSize(file.size)}</td>
                       <td className="px-4 py-4 text-moss">{new Date(file.uploadedAt).toLocaleDateString()}</td>
                       <td className="px-4 py-4">

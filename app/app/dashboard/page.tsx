@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { createSourceVerificationSampleProjectAction } from "@/app/app/actions";
+import { PendingSubmitButton } from "@/components/PendingSubmitButton";
+import { StatusBanner } from "@/components/StatusBanner";
 import { SubScopeMemory } from "@/components/SubScopeMemory";
 import { PROJECT_STATUS_LABELS } from "@/lib/catalogs";
 import { formatCurrency } from "@/lib/format";
@@ -6,7 +9,12 @@ import { requireUser } from "@/lib/server/auth";
 import { listProjects } from "@/lib/server/store";
 import { SUBSCOPE_REVIEW_AREAS } from "@/lib/subscope-content";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string }>;
+}) {
+  const status = await searchParams;
   const user = await requireUser();
   const projects = await listProjects(user);
   const reportReadyCount = projects.filter((project) => project.status === "report-ready").length;
@@ -23,10 +31,19 @@ export default async function DashboardPage() {
             Track subcontract reviews, compare GC terms against your bid, and keep questions visible before execution.
           </p>
         </div>
-        <Link href="/app/projects/new" className="button-primary">
-          Create Project
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <form action={createSourceVerificationSampleProjectAction}>
+            <PendingSubmitButton className="button-secondary" pendingLabel="Creating sample...">
+              Create Source-Backed Sample
+            </PendingSubmitButton>
+          </form>
+          <Link href="/app/projects/new" className="button-primary">
+            Create Project
+          </Link>
+        </div>
       </div>
+
+      {status?.error ? <StatusBanner tone="error">{status.error}</StatusBanner> : null}
 
       <section className="grid gap-4 md:grid-cols-3">
         {[
@@ -64,6 +81,11 @@ export default async function DashboardPage() {
               <Link href="/app/projects/new" className="button-primary mt-5">
                 Create Project
               </Link>
+              <form action={createSourceVerificationSampleProjectAction} className="mt-3">
+                <PendingSubmitButton className="button-secondary" pendingLabel="Creating sample...">
+                  Create Source-Backed Sample
+                </PendingSubmitButton>
+              </form>
             </div>
           ) : (
             <div className="overflow-x-auto">

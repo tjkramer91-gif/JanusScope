@@ -5,10 +5,13 @@ import { getProject } from "@/lib/server/store";
 
 const STEPS = [
   "Confirming project facts",
-  "Checking uploaded document types",
+  "Checking uploaded document extraction status",
+  "Building source-backed document audit",
   "Comparing GC subcontract to bid language",
   "Checking scope against exclusions",
+  "Comparing budget, bid, scope, contract, and AHJ sources where evidence exists",
   "Reviewing payment, notice, LD, indemnity, warranty, retainage, and flow-down terms",
+  "Marking missing information as unable to verify",
   "Generating clarification questions",
   "Creating report-style risk output",
   "Saving project intelligence memory",
@@ -28,7 +31,7 @@ export default async function ProcessingPage({ params }: { params: Promise<{ pro
         <p className="eyebrow">Step 4</p>
         <h1 className="mt-2 text-3xl font-semibold text-ink">Ready to generate risk output</h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-          Background document parsing can replace this step later. For now, SubScope runs a deterministic construction risk review from project facts, uploaded metadata, pasted text, and checklist answers.
+          SubScope runs a deterministic construction risk review from project facts, extracted CSV rows, uploaded document metadata, pasted context, and checklist answers. Files without extracted text are shown as unable to verify in the report.
         </p>
       </div>
 

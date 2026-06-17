@@ -6,6 +6,7 @@ const ALLOWED_UPLOAD_MIME_TYPES = new Set([
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "text/csv",
   "application/csv",
+  "application/vnd.ms-excel",
   "image/png",
   "image/jpeg",
 ]);

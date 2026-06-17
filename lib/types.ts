@@ -23,6 +23,23 @@ export type MasterServiceAgreementStatus = "yes" | "no" | "not-sure";
 export type PublicPrivateStatus = "public" | "private" | "not-sure";
 export type PrevailingWageStatus = "yes" | "no" | "not-sure";
 export type DocumentProcessingStatus = "uploaded" | "extracting" | "classified" | "failed";
+export type TextExtractionStatus = "extracted" | "unsupported" | "failed" | "metadata-only";
+export type VerificationDocumentCategory =
+  | "Budget"
+  | "Subcontractor bid"
+  | "Owner scope"
+  | "Contract"
+  | "Drawings"
+  | "Specifications"
+  | "Addenda / RFI"
+  | "Schedule"
+  | "Insurance / Bonding"
+  | "Safety"
+  | "Wage"
+  | "AHJ source"
+  | "Pricing reference"
+  | "Exclusions and assumptions"
+  | "Other";
 
 export type DocumentId =
   | "gc-subcontract"
@@ -56,8 +73,14 @@ export interface UploadedFile {
   size: number;
   type: string;
   documentId: DocumentId;
+  documentCategory?: VerificationDocumentCategory;
   storagePath: string;
   processingStatus: DocumentProcessingStatus;
+  extractionStatus?: TextExtractionStatus;
+  extractionMessage?: string;
+  extractedText?: string;
+  reviewedSectionCount?: number;
+  includedInReview?: boolean;
   uploadedAt: string;
 }
 
