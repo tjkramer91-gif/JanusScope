@@ -10,6 +10,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (request.method === "POST" && request.headers.has("next-action")) {
+    return NextResponse.next();
+  }
+
   if (!request.cookies.get("subscope_session")) {
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("returnTo", `${request.nextUrl.pathname}${request.nextUrl.search}`);
