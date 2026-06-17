@@ -11,6 +11,7 @@ const STEPS = [
   "Reviewing payment, notice, LD, indemnity, warranty, retainage, and flow-down terms",
   "Generating clarification questions",
   "Creating report-style risk output",
+  "Saving project intelligence memory",
   "Preparing export placeholders",
 ];
 

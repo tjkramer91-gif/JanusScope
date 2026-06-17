@@ -1,19 +1,29 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteDocumentAction, updateDocumentTypeAction, uploadDocumentsAction } from "@/app/app/actions";
+import { PendingSubmitButton } from "@/components/PendingSubmitButton";
+import { StatusBanner } from "@/components/StatusBanner";
 import { DOCUMENT_CATALOG } from "@/lib/catalogs";
 import { formatFileSize } from "@/lib/format";
 import { requireUser } from "@/lib/server/auth";
 import { getProject } from "@/lib/server/store";
 import { DOCUMENT_UPLOAD_AREAS } from "@/lib/subscope-content";
 
-export default async function UploadPage({ params }: { params: Promise<{ projectId: string }> }) {
+export default async function UploadPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ projectId: string }>;
+  searchParams: Promise<{ created?: string; saved?: string; uploaded?: string; error?: string }>;
+}) {
   const { projectId } = await params;
+  const status = await searchParams;
   const user = await requireUser();
   const project = await getProject(user, projectId);
   if (!project) notFound();
 
   const uploadAction = uploadDocumentsAction.bind(null, project.id);
+  const uploadedCount = Number(status.uploaded ?? 0);
 
   return (
     <div className="mx-auto max-w-[1220px] space-y-8">
@@ -29,6 +39,14 @@ export default async function UploadPage({ params }: { params: Promise<{ project
           Skip to Review Package
         </Link>
       </div>
+
+      {status.created ? <StatusBanner tone="success">Project created. Add documents or paste review language when ready.</StatusBanner> : null}
+      {status.saved ? (
+        <StatusBanner tone="success">
+          {uploadedCount > 0 ? `${uploadedCount} document${uploadedCount === 1 ? "" : "s"} uploaded and saved.` : "Project notes saved."}
+        </StatusBanner>
+      ) : null}
+      {status.error ? <StatusBanner tone="error">{status.error}</StatusBanner> : null}
 
       <form action={uploadAction} className="space-y-6">
         <section className="card p-8 sm:p-10">
@@ -54,12 +72,13 @@ export default async function UploadPage({ params }: { params: Promise<{ project
             {DOCUMENT_UPLOAD_AREAS.map((area) => (
               <label className="rounded-[24px] border border-line/60 bg-paper p-5 shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card" key={area}>
                 <span className="block text-sm font-semibold text-ink">{area}</span>
-                <span className="mt-2 block text-xs leading-5 text-moss">PDF, Word, Excel, CSV, text, or image file.</span>
+                <span className="mt-2 block text-xs leading-5 text-moss">PDF, Word, Excel, CSV, PNG, or JPG file.</span>
                 <input
                   className="mt-4 block w-full text-xs text-moss file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-xs file:font-semibold file:text-ink file:shadow-sm"
                   type="file"
                   name="files"
-                  accept=".pdf,.docx,.xlsx,.csv,.txt,.png,.jpg,.jpeg"
+                  accept=".pdf,.docx,.xlsx,.csv,.png,.jpg,.jpeg"
+                  multiple
                 />
               </label>
             ))}
@@ -96,7 +115,9 @@ export default async function UploadPage({ params }: { params: Promise<{ project
         </section>
 
         <div className="flex justify-end">
-          <button className="button-primary" type="submit">Save and Review Package</button>
+          <PendingSubmitButton className="button-primary" pendingLabel="Saving upload...">
+            Save Uploads and Notes
+          </PendingSubmitButton>
         </div>
       </form>
 

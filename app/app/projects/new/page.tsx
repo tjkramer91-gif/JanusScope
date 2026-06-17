@@ -1,7 +1,11 @@
 import { MSA_STATUS_LABELS, PROJECT_TYPE_LABELS, PUBLIC_PRIVATE_LABELS, YES_NO_NOT_SURE_LABELS } from "@/lib/catalogs";
 import { createProjectAction } from "@/app/app/actions";
+import { PendingSubmitButton } from "@/components/PendingSubmitButton";
+import { StatusBanner } from "@/components/StatusBanner";
 
-export default function NewProjectPage() {
+export default async function NewProjectPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
+
   return (
     <form action={createProjectAction} className="mx-auto max-w-[1120px] space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -12,8 +16,12 @@ export default function NewProjectPage() {
             Capture the core facts needed to compare a GC subcontract against your bid and assumptions.
           </p>
         </div>
-        <button className="button-primary" type="submit">Create Project</button>
+        <PendingSubmitButton className="button-primary" pendingLabel="Creating project...">
+          Create Project
+        </PendingSubmitButton>
       </div>
+
+      {error ? <StatusBanner tone="error">{error}</StatusBanner> : null}
 
       <section className="card p-8 sm:p-10">
         <div className="mb-8">
@@ -106,7 +114,9 @@ export default function NewProjectPage() {
       </section>
 
       <div className="flex justify-end">
-        <button className="button-primary" type="submit">Create Project and Upload Documents</button>
+        <PendingSubmitButton className="button-primary" pendingLabel="Creating project...">
+          Create Project and Upload Documents
+        </PendingSubmitButton>
       </div>
     </form>
   );

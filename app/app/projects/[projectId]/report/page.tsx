@@ -1,18 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteProjectAction, deleteReportsAction } from "@/app/app/actions";
-import { SubScopeMemory } from "@/components/SubScopeMemory";
 import { ContractComparisonTable } from "@/components/ContractComparisonTable";
 import { ExclusionCheckTable } from "@/components/ExclusionCheckTable";
 import { HiddenScopeTable } from "@/components/HiddenScopeTable";
 import { IssueLogTable } from "@/components/IssueLogTable";
 import { MissingDocuments } from "@/components/MissingDocuments";
+import { ProjectIntelligenceGraph } from "@/components/ProjectIntelligenceGraph";
 import { RecommendedRevisions } from "@/components/RecommendedRevisions";
 import { ReportNotesGrid } from "@/components/ReportNotesGrid";
 import { RiskSummary } from "@/components/RiskSummary";
 import { SeverityBadge } from "@/components/SeverityBadge";
+import { buildProjectIntelligenceGraph } from "@/lib/intelligence-graph";
 import { generateRiskReview } from "@/lib/risk-engine";
-import { addAudit, getLatestReview, getProject } from "@/lib/server/store";
+import { addAudit, getProject, listIntelligenceGraphs } from "@/lib/server/store";
 import { requireUser } from "@/lib/server/auth";
 import { RISK_OUTPUT_AREAS } from "@/lib/subscope-content";
 
@@ -23,7 +24,8 @@ export default async function ReportPage({ params }: { params: Promise<{ project
   if (!project) notFound();
 
   const review = generateRiskReview(project);
-  await getLatestReview(user, project.id);
+  const intelligenceHistory = await listIntelligenceGraphs(user, { excludeProjectId: project.id });
+  const intelligenceGraph = buildProjectIntelligenceGraph(project, review, intelligenceHistory);
   await addAudit(user, project.id, "report.viewed", {});
   const deleteReports = deleteReportsAction.bind(null, project.id);
   const deleteProject = deleteProjectAction.bind(null, project.id);
@@ -76,6 +78,7 @@ export default async function ReportPage({ params }: { params: Promise<{ project
       </section>
 
       <RiskSummary project={project} review={review} />
+      <ProjectIntelligenceGraph graph={intelligenceGraph} />
 
       <section className="card p-8 sm:p-10">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -155,7 +158,6 @@ export default async function ReportPage({ params }: { params: Promise<{ project
           ))}
         </div>
       </section>
-      <SubScopeMemory />
       <IssueLogTable issues={review.issueLog} />
     </div>
   );

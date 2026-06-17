@@ -5,20 +5,25 @@ import { revalidatePath } from "next/cache";
 import { buildRiskAnalysisJson } from "@/lib/analysis";
 import { classifyFileName, DOCUMENT_CATALOG } from "@/lib/catalogs";
 import { INTAKE_QUESTIONS } from "@/lib/checklist";
+import { buildProjectIntelligenceGraph } from "@/lib/intelligence-graph";
 import { generateRiskReview } from "@/lib/risk-engine";
 import { requireUser } from "@/lib/server/auth";
+import { errorMessage, logEvent } from "@/lib/server/logger";
 import {
   createProject,
   deleteProject,
   deleteReports,
   deleteUploadedFile,
   getProject,
+  listIntelligenceGraphs,
   saveIntakeAnswers,
   saveProject,
   saveReview,
   saveUploadedFile,
+  userFacingStoreError,
 } from "@/lib/server/store";
 import { DocumentId, IntakeAnswer, Project } from "@/lib/types";
+import { validateUploadFile } from "@/lib/upload-validation";
 import { projectInputSchema } from "@/lib/validation";
 
 function asDocumentId(value: FormDataEntryValue | null, fallback: DocumentId = "other"): DocumentId {
@@ -34,9 +39,17 @@ function syncDocumentAvailability(project: Project): Project["documents"] {
   }));
 }
 
+function firstValidationMessage(error: { issues: { message: string }[] }): string {
+  return error.issues[0]?.message ?? "Check the required fields and try again.";
+}
+
+function encodedMessage(message: string): string {
+  return encodeURIComponent(message);
+}
+
 export async function createProjectAction(formData: FormData) {
   const user = await requireUser();
-  const input = projectInputSchema.parse({
+  const input = projectInputSchema.safeParse({
     name: formData.get("name"),
     projectAddress: formData.get("projectAddress"),
     city: formData.get("city"),
@@ -54,8 +67,21 @@ export async function createProjectAction(formData: FormData) {
     prevailingWageStatus: formData.get("prevailingWageStatus"),
   });
 
-  const project = await createProject(user, input);
-  redirect(`/app/projects/${project.id}/upload`);
+  if (!input.success) {
+    const message = firstValidationMessage(input.error);
+    logEvent("warn", "project.create.validation_failed", { userId: user.id, reason: message });
+    redirect(`/app/projects/new?error=${encodedMessage(message)}`);
+  }
+
+  let project: Project;
+  try {
+    project = await createProject(user, input.data);
+  } catch (error) {
+    logEvent("error", "project.create.action_failed", { userId: user.id, reason: errorMessage(error) });
+    redirect(`/app/projects/new?error=${encodedMessage(userFacingStoreError(error))}`);
+  }
+
+  redirect(`/app/projects/${project.id}/upload?created=1`);
 }
 
 export async function uploadDocumentsAction(projectId: string, formData: FormData) {
@@ -65,11 +91,30 @@ export async function uploadDocumentsAction(projectId: string, formData: FormDat
 
   const batchDocumentType = asDocumentId(formData.get("documentType"));
   const files = formData.getAll("files").filter((value): value is File => value instanceof File && value.size > 0);
+  const firstInvalidFile = files
+    .map((file) => ({ file, message: validateUploadFile(file) }))
+    .find((item) => item.message);
+
+  if (firstInvalidFile?.message) {
+    logEvent("warn", "upload.validation_failed", {
+      userId: user.id,
+      projectId,
+      fileName: firstInvalidFile.file.name,
+      reason: firstInvalidFile.message,
+    });
+    redirect(`/app/projects/${projectId}/upload?error=${encodedMessage(firstInvalidFile.message)}`);
+  }
+
   const uploaded = [];
-  for (const file of files) {
-    const documentType = batchDocumentType === "other" ? classifyFileName(file.name) : batchDocumentType;
-    const saved = await saveUploadedFile(user, project, file, documentType);
-    if (saved) uploaded.push(saved);
+  try {
+    for (const file of files) {
+      const documentType = batchDocumentType === "other" ? classifyFileName(file.name) : batchDocumentType;
+      const saved = await saveUploadedFile(user, project, file, documentType);
+      if (saved) uploaded.push(saved);
+    }
+  } catch (error) {
+    logEvent("error", "upload.save_failed", { userId: user.id, projectId, reason: errorMessage(error) });
+    redirect(`/app/projects/${projectId}/upload?error=${encodedMessage(userFacingStoreError(error))}`);
   }
 
   const nextProject: Project = {
@@ -83,10 +128,16 @@ export async function uploadDocumentsAction(projectId: string, formData: FormDat
     deleteDocumentsAfterReport: formData.get("deleteDocumentsAfterReport") === "on",
   };
   nextProject.documents = syncDocumentAvailability(nextProject);
-  await saveProject(user, nextProject, uploaded.length > 0 ? "file.uploaded" : "project.updated");
+  try {
+    await saveProject(user, nextProject, uploaded.length > 0 ? "file.uploaded" : "project.updated");
+  } catch (error) {
+    logEvent("error", "upload.project_update_failed", { userId: user.id, projectId, reason: errorMessage(error) });
+    redirect(`/app/projects/${projectId}/upload?error=${encodedMessage(userFacingStoreError(error))}`);
+  }
 
   revalidatePath(`/app/projects/${projectId}/upload`);
-  redirect(`/app/projects/${projectId}/questions`);
+  logEvent("info", "upload.action_succeeded", { userId: user.id, projectId, uploadedCount: uploaded.length });
+  redirect(`/app/projects/${projectId}/upload?saved=1&uploaded=${uploaded.length}`);
 }
 
 export async function updateDocumentTypeAction(projectId: string, fileId: string, formData: FormData) {
@@ -136,7 +187,9 @@ export async function runReviewAction(projectId: string) {
     riskLevel: review.riskLevel,
   };
   const analysisJson = buildRiskAnalysisJson(completedProject, review);
-  await saveReview(user, completedProject, analysisJson);
+  const intelligenceHistory = await listIntelligenceGraphs(user, { excludeProjectId: completedProject.id });
+  const intelligenceGraph = buildProjectIntelligenceGraph(completedProject, review, intelligenceHistory);
+  await saveReview(user, completedProject, analysisJson, intelligenceGraph);
 
   if (completedProject.deleteDocumentsAfterReport) {
     for (const file of completedProject.uploadedFiles) {

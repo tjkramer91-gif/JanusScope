@@ -5,9 +5,12 @@ create table if not exists users (
   auth0_user_id text unique not null,
   email text not null,
   name text,
+  password_hash text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+create unique index if not exists users_email_lower_unique_idx on users (lower(email));
 
 create table if not exists organizations (
   id uuid primary key default gen_random_uuid(),
@@ -47,6 +50,11 @@ create table if not exists projects (
   status text not null default 'draft',
   risk_score integer,
   risk_level text,
+  subcontract_text text not null default '',
+  bid_text text not null default '',
+  exclusions_text text not null default '',
+  notes_text text not null default '',
+  delete_documents_after_report boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -89,9 +97,18 @@ create table if not exists reviews (
   risk_score integer not null,
   risk_level text not null,
   signing_recommendation text,
+  intelligence_graph jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table users add column if not exists password_hash text;
+alter table projects add column if not exists subcontract_text text not null default '';
+alter table projects add column if not exists bid_text text not null default '';
+alter table projects add column if not exists exclusions_text text not null default '';
+alter table projects add column if not exists notes_text text not null default '';
+alter table projects add column if not exists delete_documents_after_report boolean not null default false;
+alter table reviews add column if not exists intelligence_graph jsonb;
 
 create table if not exists risk_issues (
   id uuid primary key default gen_random_uuid(),
@@ -146,7 +163,7 @@ alter table risk_issues enable row level security;
 alter table reports enable row level security;
 alter table audit_logs enable row level security;
 
--- Policies assume the app sets request.jwt.claims.sub to the Auth0 user id or proxies access through trusted server routes.
+-- The app writes through trusted server routes with the service role key. Policies remain scoped for future client-side reads.
 create policy "users own profile" on users
   for all using (auth0_user_id = auth.jwt() ->> 'sub');
 

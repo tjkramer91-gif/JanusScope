@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import crypto from "node:crypto";
+import { logEvent } from "@/lib/server/logger";
 
 const SESSION_COOKIE = "subscope_session";
 const STATE_COOKIE = "subscope_auth_state";
@@ -18,7 +19,7 @@ interface SessionPayload {
 }
 
 function sessionSecret(): string {
-  return process.env.AUTH0_SECRET || "local-dev-subscope-secret-change-me";
+  return process.env.SESSION_SECRET || process.env.AUTH0_SECRET || "local-dev-subscope-secret-change-me";
 }
 
 function sign(value: string): string {
@@ -50,7 +51,10 @@ export async function getSession(): Promise<SessionUser | null> {
 
 export async function requireUser(): Promise<SessionUser> {
   const user = await getSession();
-  if (!user) redirect("/auth/login?returnTo=/app/dashboard");
+  if (!user) {
+    logEvent("warn", "auth.required.redirect", { destination: "/auth/login" });
+    redirect("/auth/login?returnTo=/app/dashboard");
+  }
   return user;
 }
 
@@ -67,12 +71,14 @@ export async function setSession(user: SessionUser): Promise<void> {
       maxAge: 60 * 60 * 12,
     },
   );
+  logEvent("info", "auth.session.created", { userId: user.id });
 }
 
 export async function clearSession(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE);
   cookieStore.delete(STATE_COOKIE);
+  logEvent("info", "auth.session.cleared");
 }
 
 export function hasAuth0Config(): boolean {

@@ -210,6 +210,48 @@ export interface IssueLogItem {
   dateResolved: string;
 }
 
+export type IntelligenceNodeType = "project" | "gc" | "trade" | "risk-category" | "issue" | "document" | "question";
+
+export type IntelligenceEdgeType = "involves" | "flags" | "belongs-to" | "needs" | "asks" | "repeats-with";
+
+export interface IntelligenceNode {
+  id: string;
+  type: IntelligenceNodeType;
+  label: string;
+  summary: string;
+  weight: number;
+  severity?: Severity;
+  metadata?: Record<string, string | number | boolean | null>;
+}
+
+export interface IntelligenceEdge {
+  id: string;
+  from: string;
+  to: string;
+  type: IntelligenceEdgeType;
+  label: string;
+  weight: number;
+}
+
+export interface IntelligenceSignal {
+  id: string;
+  title: string;
+  body: string;
+  severity: Severity;
+  confidence: "observed" | "emerging" | "supported";
+  evidenceCount: number;
+  nodeIds: string[];
+}
+
+export interface IntelligenceGraph {
+  generatedAt: string;
+  projectId: string;
+  organizationId: string;
+  nodes: IntelligenceNode[];
+  edges: IntelligenceEdge[];
+  signals: IntelligenceSignal[];
+}
+
 export interface RiskReview {
   generatedAt: string;
   overallRating: Severity;
