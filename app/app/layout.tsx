@@ -15,7 +15,7 @@ export default async function ProtectedAppLayout({ children }: { children: React
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <span className="hidden text-moss sm:inline">{user.email}</span>
-            <Link href="/auth/logout" className="button-secondary">Log out</Link>
+            <Link href="/auth/logout" prefetch={false} className="button-secondary">Log out</Link>
           </div>
         </div>
       </header>
