@@ -38,7 +38,7 @@ Required for production:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_UPLOAD_BUCKET`
 
-When Supabase variables are missing locally, the app uses `.data/subscope-db.json` and `.data/uploads` so the product flow can be tested without cloud credentials. Production should use Supabase for durable project and document records.
+When Supabase variables are missing locally, the app uses `.data/subscope-db.json` and `.data/uploads` so the product flow can be tested without cloud credentials. On Vercel without Supabase, the app uses Vercel Runtime Cache as a temporary shared fallback so the flow does not crash across functions. Production should use Supabase for durable project and document records.
 
 ## Run Locally
 
@@ -71,7 +71,7 @@ npm run build
 4. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only.
 5. Use signed URLs for temporary downloads in production.
 
-The current local MVP uses `.data/subscope-db.json` and `.data/uploads` as a durable dev fallback so the app works without Supabase credentials. On Vercel, configure Supabase before relying on project or upload persistence.
+The current local MVP uses `.data/subscope-db.json` and `.data/uploads` as a durable dev fallback so the app works without Supabase credentials. On Vercel, Runtime Cache keeps the flow stable while Supabase is missing, but it is not a database and can evict data.
 
 ## Authentication Setup
 
@@ -93,7 +93,7 @@ For Playwright PDF generation on serverless, keep the `playwright` dependency in
 
 ## Known Limitations
 
-- Local fallback storage is used unless Supabase persistence is configured with the included schema.
+- Local fallback storage or Vercel Runtime Cache is used unless Supabase persistence is configured with the included schema.
 - Uploaded binary files are stored locally in dev; production should use Supabase Storage private buckets.
 - PDF/DOCX/XLSX/OCR extraction is scaffolded but not fully implemented.
 - The analysis engine is deterministic and validates structured JSON; an LLM provider can replace or augment it later.

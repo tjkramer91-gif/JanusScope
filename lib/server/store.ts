@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { getCache } from "@vercel/functions";
 import { DOCUMENT_CATALOG, createEmptyProject } from "@/lib/catalogs";
 import { errorMessage, logEvent } from "@/lib/server/logger";
 import { getSupabaseAdmin, hasSupabaseConfig } from "@/lib/server/supabase";
@@ -72,9 +73,19 @@ type DbRow = Record<string, unknown>;
 const DATA_DIR = process.env.SUBSCOPE_DATA_DIR || (process.env.VERCEL ? path.join(os.tmpdir(), "subscope-data") : path.join(process.cwd(), ".data"));
 const DB_PATH = path.join(DATA_DIR, "subscope-db.json");
 const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
+const RUNTIME_CACHE_DB_KEY = "db";
+const RUNTIME_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 function shouldUseSupabase(): boolean {
   return hasSupabaseConfig();
+}
+
+function shouldUseRuntimeCache(): boolean {
+  return Boolean(process.env.VERCEL) && !shouldUseSupabase();
+}
+
+function emptyDb(): Database {
+  return { users: [], projects: [], reviews: [], auditLogs: [] };
 }
 
 async function ensureDataDir(): Promise<void> {
@@ -83,16 +94,38 @@ async function ensureDataDir(): Promise<void> {
 }
 
 async function readDb(): Promise<Database> {
+  if (shouldUseRuntimeCache()) {
+    try {
+      const cached = await getCache({ namespace: "subscope-store" }).get(RUNTIME_CACHE_DB_KEY);
+      return cached ? (cached as Database) : emptyDb();
+    } catch (error) {
+      logEvent("warn", "runtime_cache.read_failed", { reason: errorMessage(error) });
+    }
+  }
+
   await ensureDataDir();
   try {
     const value = await fs.readFile(DB_PATH, "utf8");
     return JSON.parse(value) as Database;
   } catch {
-    return { users: [], projects: [], reviews: [], auditLogs: [] };
+    return emptyDb();
   }
 }
 
 async function writeDb(db: Database): Promise<void> {
+  if (shouldUseRuntimeCache()) {
+    try {
+      await getCache({ namespace: "subscope-store" }).set(RUNTIME_CACHE_DB_KEY, db, {
+        ttl: RUNTIME_CACHE_TTL_SECONDS,
+        tags: ["subscope-db"],
+        name: "subscope-db",
+      });
+      return;
+    } catch (error) {
+      logEvent("warn", "runtime_cache.write_failed", { reason: errorMessage(error) });
+    }
+  }
+
   await ensureDataDir();
   await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2));
 }
