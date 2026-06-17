@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import crypto from "node:crypto";
 import { logEvent } from "@/lib/server/logger";
@@ -44,8 +44,13 @@ function decodeSession(value?: string): SessionPayload | null {
 }
 
 export async function getSession(): Promise<SessionUser | null> {
-  const cookieStore = await cookies();
-  const payload = decodeSession(cookieStore.get(SESSION_COOKIE)?.value);
+  const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
+  const cookieValue = cookieStore.get(SESSION_COOKIE)?.value;
+  const forwardedValue =
+    headerStore.get("x-subscope-session-verified") === "1"
+      ? headerStore.get("x-subscope-session") ?? undefined
+      : undefined;
+  const payload = decodeSession(cookieValue ?? forwardedValue);
   return payload?.user ?? null;
 }
 

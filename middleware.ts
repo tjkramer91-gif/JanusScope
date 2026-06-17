@@ -2,16 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_PATHS = new Set(["/", "/auth/login", "/auth/signup", "/auth/callback", "/auth/logout"]);
 
+function nextWithSessionHeaders(request: NextRequest): NextResponse {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.delete("x-subscope-session");
+  requestHeaders.delete("x-subscope-session-verified");
+
+  const sessionCookie = request.cookies.get("subscope_session")?.value;
+  if (sessionCookie) {
+    requestHeaders.set("x-subscope-session", sessionCookie);
+    requestHeaders.set("x-subscope-session-verified", "1");
+  }
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+}
+
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublic = PUBLIC_PATHS.has(path);
 
   if (isPublic) {
-    return NextResponse.next();
+    return nextWithSessionHeaders(request);
   }
 
   if (request.method === "POST" && request.headers.has("next-action")) {
-    return NextResponse.next();
+    return nextWithSessionHeaders(request);
   }
 
   if (!request.cookies.get("subscope_session")) {
@@ -21,7 +39,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next();
+  return nextWithSessionHeaders(request);
 }
 
 export const config = {
