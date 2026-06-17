@@ -131,13 +131,17 @@ export async function readLoginState(expectedState: string): Promise<{ returnTo:
   };
 }
 
-export function makeLocalDevUser(): SessionUser {
+export function makeDemoUser(): SessionUser {
   return {
-    id: "local-user",
-    auth0UserId: "auth0|local-dev",
-    email: "demo@subscope.local",
-    name: "Demo Subcontractor",
+    id: "demo-user",
+    auth0UserId: "demo|subscope",
+    email: "demo@januscope.local",
+    name: "Demo Reviewer",
   };
+}
+
+export function makeLocalDevUser(): SessionUser {
+  return makeDemoUser();
 }
 
 export function decodeJwtPayload(idToken: string): Record<string, unknown> {

@@ -3,10 +3,10 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { safeReturnTo } from "@/lib/return-to";
-import { setSession } from "@/lib/server/auth";
+import { makeDemoUser, setSession } from "@/lib/server/auth";
 import { errorMessage, logEvent } from "@/lib/server/logger";
 import { hashPassword, verifyPassword } from "@/lib/server/password";
-import { createPasswordUser, findPasswordUserByEmail } from "@/lib/server/store";
+import { createPasswordUser, ensureWorkspace, findPasswordUserByEmail } from "@/lib/server/store";
 
 export interface AuthFormState {
   error: string;
@@ -79,5 +79,14 @@ export async function signupAction(_previousState: AuthFormState, formData: Form
     };
   }
 
+  redirect(safeReturnTo(returnTo));
+}
+
+export async function demoAccessAction(formData: FormData): Promise<void> {
+  const returnTo = String(formData.get("returnTo") || "/app/dashboard");
+  const user = makeDemoUser();
+  await setSession(user);
+  await ensureWorkspace(user);
+  logEvent("info", "auth.demo.succeeded", { userId: user.id });
   redirect(safeReturnTo(returnTo));
 }

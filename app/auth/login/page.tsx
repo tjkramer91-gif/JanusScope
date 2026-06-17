@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/AuthForm";
+import { DemoAccessForm } from "@/components/DemoAccessForm";
 import { safeReturnTo } from "@/lib/return-to";
 import { getSession } from "@/lib/server/auth";
 
@@ -12,6 +13,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <main className="min-h-screen bg-paper px-5 py-12">
       <AuthForm mode="login" returnTo={destination} />
+      <DemoAccessForm returnTo={destination} />
     </main>
   );
 }

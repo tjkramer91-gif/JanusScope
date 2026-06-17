@@ -7,6 +7,7 @@ SubScope Risk Review is a production-ready MVP for subcontractors who need to co
 - Public landing page at `/` with plain contractor-focused copy and sample report CTA
 - Security and data handling page at `/security`
 - Auth routes at `/auth/login`, `/auth/signup`, and `/auth/logout`
+- Temporary demo access from login/signup for product-flow testing
 - Protected app routes under `/app`
 - Dashboard at `/app/dashboard`
 - New project flow at `/app/projects/new`
@@ -79,6 +80,7 @@ The current local MVP uses `.data/subscope-db.json` and `.data/uploads` as a dur
 2. Run the Supabase schema so `users.password_hash` exists.
 3. Users sign up or log in at `/auth/signup` and `/auth/login`.
 4. Logged-out users are redirected to login before dashboard, project, upload, or report routes.
+5. Use `Continue in Demo Mode` on the auth pages for temporary QA access while the product flow is being stabilized.
 
 ## Deploy To Vercel
 
