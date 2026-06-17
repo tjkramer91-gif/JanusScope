@@ -6,6 +6,7 @@ import { ExclusionCheckTable } from "@/components/ExclusionCheckTable";
 import { HiddenScopeTable } from "@/components/HiddenScopeTable";
 import { IssueLogTable } from "@/components/IssueLogTable";
 import { MissingDocuments } from "@/components/MissingDocuments";
+import { PriorityRiskOutput } from "@/components/PriorityRiskOutput";
 import { ProjectIntelligenceGraph } from "@/components/ProjectIntelligenceGraph";
 import { RecommendedRevisions } from "@/components/RecommendedRevisions";
 import { ReportNotesGrid } from "@/components/ReportNotesGrid";
@@ -13,11 +14,14 @@ import { RiskSummary } from "@/components/RiskSummary";
 import { SeverityBadge } from "@/components/SeverityBadge";
 import { SourceVerificationReport } from "@/components/SourceVerificationReport";
 import { buildProjectIntelligenceGraph } from "@/lib/intelligence-graph";
+import { buildPrioritizedReport } from "@/lib/prioritized-report";
 import { generateRiskReview } from "@/lib/risk-engine";
 import { addAudit, getProject, listIntelligenceGraphs } from "@/lib/server/store";
 import { requireUser } from "@/lib/server/auth";
 import { buildSourceVerification } from "@/lib/source-verification";
 import { RISK_OUTPUT_AREAS } from "@/lib/subscope-content";
+import { detectTradeScope } from "@/lib/trade-detector";
+import { buildTradeSpecificReview } from "@/lib/trade-review";
 
 export default async function ReportPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params;
@@ -27,6 +31,9 @@ export default async function ReportPage({ params }: { params: Promise<{ project
 
   const review = generateRiskReview(project);
   const sourceVerification = buildSourceVerification(project);
+  const detectedTrade = detectTradeScope(project);
+  const tradeFindings = buildTradeSpecificReview(project, detectedTrade);
+  const priorityReport = buildPrioritizedReport({ review, sourceVerification, detectedTrade, tradeFindings });
   const intelligenceHistory = await listIntelligenceGraphs(user, { excludeProjectId: project.id });
   const intelligenceGraph = buildProjectIntelligenceGraph(project, review, intelligenceHistory);
   await addAudit(user, project.id, "report.viewed", {});
@@ -81,6 +88,13 @@ export default async function ReportPage({ params }: { params: Promise<{ project
       </section>
 
       <RiskSummary project={project} review={review} />
+      <PriorityRiskOutput report={priorityReport} />
+
+      <details className="border-t border-line/70 pt-6">
+        <summary className="cursor-pointer rounded-[18px] border border-line/60 bg-paper px-5 py-4 text-lg font-semibold text-ink">
+          Expand for full detail, source audit, and export tables
+        </summary>
+        <div className="mt-8 space-y-8">
       <SourceVerificationReport report={sourceVerification} />
       <ProjectIntelligenceGraph graph={intelligenceGraph} />
 
@@ -163,6 +177,8 @@ export default async function ReportPage({ params }: { params: Promise<{ project
         </div>
       </section>
       <IssueLogTable issues={review.issueLog} />
+        </div>
+      </details>
     </div>
   );
 }

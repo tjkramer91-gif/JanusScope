@@ -13,7 +13,7 @@ export default async function NewProjectPage({ searchParams }: { searchParams: P
           <p className="eyebrow">Step 1</p>
           <h1 className="mt-2 text-3xl font-semibold text-ink">Create SubScope project</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-moss">
-            Capture the core facts needed to compare a GC subcontract against your bid and assumptions.
+            Add the basic project context. If you do not know the trade yet, JanusScope will infer it from the package.
           </p>
         </div>
         <PendingSubmitButton className="button-primary" pendingLabel="Creating project...">
@@ -37,11 +37,11 @@ export default async function NewProjectPage({ searchParams }: { searchParams: P
           </label>
           <label>
             <span className="field-label">GC name</span>
-            <input className="field" name="gcName" required placeholder="General contractor" />
+            <input className="field" name="gcName" placeholder="General contractor, if known" />
           </label>
           <label>
-            <span className="field-label">Trade</span>
-            <input className="field" name="tradeType" required placeholder="Electrical, drywall, civil..." />
+            <span className="field-label">Trade/scope if known</span>
+            <input className="field" name="tradeType" placeholder="Electrical, windows, roofing..." />
           </label>
           <label>
             <span className="field-label">Contract amount</span>
@@ -69,11 +69,15 @@ export default async function NewProjectPage({ searchParams }: { searchParams: P
           </label>
           <label>
             <span className="field-label">ZIP</span>
-            <input className="field" name="zip" required />
+            <input className="field" name="zip" />
           </label>
           <label>
             <span className="field-label">Owner name</span>
             <input className="field" name="ownerName" placeholder="Optional" />
+          </label>
+          <label className="md:col-span-2 xl:col-span-4">
+            <span className="field-label">Basic project notes</span>
+            <textarea className="field min-h-24" name="projectNotes" placeholder="Anything already known about the package, scope, deadline, or concern." />
           </label>
         </div>
       </section>

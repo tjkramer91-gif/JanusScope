@@ -38,6 +38,7 @@ export type VerificationDocumentCategory =
   | "Wage"
   | "AHJ source"
   | "Pricing reference"
+  | "Product data / submittal"
   | "Exclusions and assumptions"
   | "Other";
 
@@ -59,6 +60,8 @@ export type DocumentId =
   | "wage"
   | "permit-ahj"
   | "prime-contract-excerpt"
+  | "budget"
+  | "product-data"
   | "other";
 
 export interface DocumentAvailability {

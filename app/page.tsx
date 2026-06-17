@@ -134,7 +134,7 @@ export default function LandingPage() {
       <section className="border-y border-line/45 bg-white" id="how-it-works">
         <div className="mx-auto max-w-[1180px] px-5 py-20 lg:px-8 lg:py-24">
           <p className="eyebrow">How it works</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-normal text-ink">Five practical steps from project setup to signing questions.</h2>
+          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-normal text-ink">A faster path from package upload to prioritized risk output.</h2>
           <div className="mt-10 grid gap-4 lg:grid-cols-5">
             {HOW_IT_WORKS_STEPS.map(([title, body], index) => (
               <article className="rounded-[26px] border border-line/60 bg-paper p-6" key={title}>

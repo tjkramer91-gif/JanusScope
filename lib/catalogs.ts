@@ -25,6 +25,8 @@ export const DOCUMENT_CATALOG: Omit<DocumentAvailability, "available">[] = [
   { id: "wage", label: "Wage requirements" },
   { id: "permit-ahj", label: "Permit or AHJ requirements" },
   { id: "prime-contract-excerpt", label: "Prime contract excerpt" },
+  { id: "budget", label: "Budget" },
+  { id: "product-data", label: "Product data or submittal" },
   { id: "other", label: "Other supporting document" },
 ];
 
@@ -127,6 +129,8 @@ export function classifyFileName(fileName: string): DocumentId {
   const name = fileName.toLowerCase();
   if (/(subcontract|sub[-_ ]?contract|agreement|contract)/.test(name)) return "gc-subcontract";
   if (/(bid|proposal|quote|estimate)/.test(name)) return "bid-proposal";
+  if (/(budget|allowance|cost[-_ ]?plan|owner[-_ ]?estimate)/.test(name)) return "budget";
+  if (/(product[-_ ]?data|submittal|cut[-_ ]?sheet|manufacturer|spec[-_ ]?sheet)/.test(name)) return "product-data";
   if (/(scope|work letter|scope letter)/.test(name)) return "scope-letter";
   if (/(exclusion|assumption)/.test(name)) return "exclusions-assumptions";
   if (/(msa|master service)/.test(name)) return "msa";

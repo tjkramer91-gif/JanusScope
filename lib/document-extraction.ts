@@ -59,6 +59,10 @@ export function documentCategoryFor(documentId: DocumentId, fileName: string): V
       return "Wage";
     case "permit-ahj":
       return "AHJ source";
+    case "budget":
+      return "Budget";
+    case "product-data":
+      return "Product data / submittal";
     case "exclusions-assumptions":
       return "Exclusions and assumptions";
     default:

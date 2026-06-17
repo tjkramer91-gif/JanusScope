@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteDocumentAction, updateDocumentTypeAction, uploadDocumentsAction } from "@/app/app/actions";
+import { PackageUploadDropzone } from "@/components/PackageUploadDropzone";
 import { PendingSubmitButton } from "@/components/PendingSubmitButton";
 import { StatusBanner } from "@/components/StatusBanner";
-import { DOCUMENT_CATALOG } from "@/lib/catalogs";
+import { classificationOptions, classifyUploadedFile } from "@/lib/document-classifier";
 import { formatFileSize } from "@/lib/format";
+import { REVIEW_FOCUS_OPTIONS } from "@/lib/review-focus";
 import { requireUser } from "@/lib/server/auth";
 import { getProject } from "@/lib/server/store";
-import { DOCUMENT_UPLOAD_AREAS } from "@/lib/subscope-content";
 
 export default async function UploadPage({
   params,
@@ -30,13 +31,13 @@ export default async function UploadPage({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="eyebrow">Step 2</p>
-          <h1 className="mt-2 text-3xl font-semibold text-ink">Upload SubScope documents</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-ink">Upload package and start review</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-            Add the package you received from the GC and the documents you used to price the work. CSV uploads are text-extracted for source-backed review; PDF, Word, Excel, PNG, and JPG uploads are stored and tracked until deeper parsing is added.
+            Upload the documents in one place. JanusScope will classify the files, infer the likely trade, and start the review automatically.
           </p>
         </div>
         <Link className="button-secondary" href={`/app/projects/${project.id}/questions`}>
-          Skip to Review Package
+          View Review Package
         </Link>
       </div>
 
@@ -50,63 +51,38 @@ export default async function UploadPage({
 
       <form action={uploadAction} className="space-y-6">
         <section className="card p-8 sm:p-10">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <h2 className="section-title">Document areas</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-                Use the matching area when you have it. Filename classification helps organize the document list after upload.
-              </p>
-            </div>
-            <label className="min-w-64">
-              <span className="field-label">Fallback document type</span>
-              <select className="field" name="documentType" defaultValue="other">
-                <option value="other">Auto-classify or Other</option>
-                {DOCUMENT_CATALOG.map((document) => (
-                  <option value={document.id} key={document.id}>{document.label}</option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            {DOCUMENT_UPLOAD_AREAS.map((area) => (
-              <label className="rounded-[24px] border border-line/60 bg-paper p-5 shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card" key={area}>
-                <span className="block text-sm font-semibold text-ink">{area}</span>
-                <span className="mt-2 block text-xs leading-5 text-moss">PDF, Word, Excel, CSV, PNG, or JPG file.</span>
-                <input
-                  className="mt-4 block w-full text-xs text-moss file:mr-3 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-xs file:font-semibold file:text-ink file:shadow-sm"
-                  type="file"
-                  name="files"
-                  accept=".pdf,.docx,.xlsx,.csv,.png,.jpg,.jpeg"
-                  multiple
-                />
-              </label>
-            ))}
-          </div>
+          <PackageUploadDropzone />
         </section>
 
         <section className="card p-8 sm:p-10">
-          <h2 className="section-title">Key language for this review</h2>
+          <h2 className="section-title">Review Focus</h2>
           <p className="mt-2 text-sm leading-6 text-moss">
-            Paste any key language that is not available in readable uploads. The report separates pasted context from uploaded source evidence.
+            Choose a few focus areas, or leave Review everything selected.
           </p>
-          <div className="mt-6 grid gap-6 lg:grid-cols-3">
-            <label>
-              <span className="field-label">GC subcontract language</span>
-              <textarea className="field min-h-[280px]" name="subcontractText" defaultValue={project.subcontractText} placeholder="Payment, flow-down, indemnity, change order, schedule, LD, warranty, retainage, and scope clauses..." />
-            </label>
-            <label>
-              <span className="field-label">Subcontractor bid/proposal language</span>
-              <textarea className="field min-h-[280px]" name="bidText" defaultValue={project.bidText} placeholder="Proposal scope, inclusions, alternates, unit prices, assumptions, and bid date..." />
-            </label>
-            <label>
-              <span className="field-label">Qualifications and exclusions</span>
-              <textarea className="field min-h-[280px]" name="exclusionsText" defaultValue={project.exclusionsText} placeholder="Exclusions, clarifications, owner/GC furnished items, permit assumptions, schedule assumptions..." />
-            </label>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {REVIEW_FOCUS_OPTIONS.map((option, index) => (
+              <label className="cursor-pointer" key={option.id}>
+                <input
+                  className="peer sr-only"
+                  type="checkbox"
+                  name="reviewFocus"
+                  value={option.id}
+                  defaultChecked={index === 0}
+                />
+                <span className="inline-flex rounded-full border border-line/70 bg-paper px-4 py-2 text-sm font-semibold text-moss transition peer-checked:border-steel peer-checked:bg-[#eaf3ff] peer-checked:text-steel">
+                  {option.label}
+                </span>
+              </label>
+            ))}
           </div>
-          <label className="mt-5 block">
-            <span className="field-label">Other supporting notes</span>
-            <textarea className="field min-h-24" name="notesText" defaultValue={project.notesText} placeholder="Addenda received, verbal assumptions, drawing/spec concerns, GC conversations, or open questions." />
+
+          <label className="mt-8 block">
+            <span className="field-label">Anything specific you want JanusScope to look for?</span>
+            <textarea
+              className="field min-h-32"
+              name="reviewNotes"
+              placeholder="Check if this bid misses anything from the scope. Review for hidden contract risk. Compare the sub bid against the owner scope. Focus on windows, permits, and code requirements. Tell me the biggest cost exposure before we issue the subcontract."
+            />
           </label>
           <label className="mt-5 flex items-start gap-3 rounded-[22px] border border-line/60 bg-paper p-5 text-sm text-moss">
             <input type="checkbox" name="deleteDocumentsAfterReport" defaultChecked={project.deleteDocumentsAfterReport} className="mt-1 h-4 w-4 accent-steel" />
@@ -115,8 +91,8 @@ export default async function UploadPage({
         </section>
 
         <div className="flex justify-end">
-          <PendingSubmitButton className="button-primary" pendingLabel="Saving upload...">
-            Save Uploads and Notes
+          <PendingSubmitButton className="button-primary" pendingLabel="Saving and starting review...">
+            Save Uploads and Start Review
           </PendingSubmitButton>
         </div>
       </form>
@@ -134,7 +110,7 @@ export default async function UploadPage({
               <thead className="bg-paper/70 text-xs uppercase text-moss">
                 <tr>
                   <th className="px-4 py-3 font-semibold">File</th>
-                  <th className="px-4 py-3 font-semibold">Document type</th>
+                  <th className="px-4 py-3 font-semibold">Classification</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
                   <th className="px-4 py-3 font-semibold">Extraction</th>
                   <th className="px-4 py-3 font-semibold">Size</th>
@@ -146,6 +122,7 @@ export default async function UploadPage({
                 {project.uploadedFiles.map((file) => {
                   const updateAction = updateDocumentTypeAction.bind(null, project.id, file.id);
                   const deleteAction = deleteDocumentAction.bind(null, project.id, file.id);
+                  const classification = classifyUploadedFile(file);
                   return (
                     <tr key={file.id}>
                       <td className="px-4 py-4">
@@ -155,12 +132,15 @@ export default async function UploadPage({
                       <td className="px-4 py-4">
                         <form action={updateAction} className="flex gap-2">
                           <select className="field min-w-56 py-2" name="documentType" defaultValue={file.documentId}>
-                            {DOCUMENT_CATALOG.map((document) => (
+                            {classificationOptions().map((document) => (
                               <option value={document.id} key={document.id}>{document.label}</option>
                             ))}
                           </select>
-                          <button className="button-secondary py-2" type="submit">Save</button>
+                          <button className="button-secondary py-2" type="submit">Confirm</button>
                         </form>
+                        <p className="mt-2 text-xs font-semibold text-moss">
+                          {classification.label} · {classification.confidence} confidence · {classification.status}
+                        </p>
                       </td>
                       <td className="px-4 py-4 capitalize text-moss">{file.processingStatus}</td>
                       <td className="px-4 py-4 text-moss">

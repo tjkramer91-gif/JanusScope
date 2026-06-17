@@ -9,12 +9,11 @@ import {
 
 const PROJECT_FIELDS = [
   "Project name",
-  "GC name",
-  "Trade",
+  "GC if known",
+  "Trade/scope if known",
   "Contract amount",
   "Project location",
-  "Bid date",
-  "Contract execution deadline",
+  "Project notes",
 ];
 
 const MOCK_FLAGS = [
@@ -78,7 +77,7 @@ export default function SubScopePage() {
                 {[
                   ["Projects", "12"],
                   ["Open risks", "38"],
-                  ["GC questions", "24"],
+                  ["Top risks", "5"],
                 ].map(([label, value]) => (
                   <div className="rounded-[22px] border border-line/60 bg-paper p-5" key={label}>
                     <p className="text-xs font-semibold uppercase text-moss">{label}</p>
@@ -140,7 +139,7 @@ export default function SubScopePage() {
             <p className="eyebrow">Step 2</p>
             <h2 className="mt-2 text-2xl font-semibold text-ink">Upload documents</h2>
             <p className="mt-3 text-sm leading-6 text-moss">
-              Keep the review organized by document type. Parsing and background processing can be added later.
+              Upload the whole package in one place. JanusScope classifies the documents and starts the review.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">

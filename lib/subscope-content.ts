@@ -27,29 +27,24 @@ export const SUBSCOPE_REVIEW_AREAS = [
 ];
 
 export const DOCUMENT_UPLOAD_AREAS = [
-  "Subcontract agreement",
-  "Subcontractor bid/proposal",
-  "Scope sheet",
-  "Drawings",
-  "Specifications",
-  "Addenda",
-  "Schedule",
-  "Insurance requirements",
-  "Master service agreement",
-  "Other supporting documents",
+  "One package upload",
+  "Automatic document classification",
+  "Manual classification confirmation",
+  "Review notes",
+  "Review focus chips",
+  "Trade/scope detection",
 ];
 
 export const RISK_OUTPUT_AREAS = [
   "Overall risk rating",
-  "High-risk contract clauses",
-  "Hidden scope warnings",
-  "Missing exclusions",
-  "Conflicting document notes",
-  "Clarification questions",
-  "Suggested contract comments",
-  "Suggested qualifications/exclusions",
-  "Executive summary",
-  "Export to PDF placeholder",
+  "Top 5 risks",
+  "Biggest cost misses",
+  "Contract and scope traps",
+  "Missing information",
+  "Questions to ask",
+  "Source-backed findings",
+  "Full detail on demand",
+  "Exportable report",
 ];
 
 export const SUBSCOPE_MEMORY_ITEMS = [
@@ -74,11 +69,11 @@ export const SECURITY_CONTROLS = [
 ];
 
 export const HOW_IT_WORKS_STEPS = [
-  ["Create project", "Enter project, GC, trade, amount, location, bid date, and execution deadline."],
-  ["Upload documents", "Add the subcontract, proposal, scope sheet, drawings, specs, addenda, schedule, insurance, MSA, and support files."],
-  ["Review package", "Compare contract language against what you priced, excluded, assumed, and received in the document set."],
-  ["Read risk output", "Review clause risk, hidden scope, missing exclusions, conflicts, questions, and suggested comments before signing."],
-  ["Build memory", "Capture GC patterns, trade gaps, past clarification responses, change order issues, and lessons learned."],
+  ["Create project", "Enter the basic project context. Trade can be left blank if the package makes it clear."],
+  ["Upload package", "Drop the documents in one place and add any notes about what should be checked."],
+  ["Review package", "JanusScope classifies documents, detects the likely trade, and starts the review."],
+  ["Read risk output", "See top risks, cost misses, contract traps, missing information, and next questions first."],
+  ["Expand detail", "Open the full source audit, tables, and export views when deeper backup is needed."],
 ];
 
 export const COMING_SOON_PRODUCTS = [

@@ -11,16 +11,18 @@ SubScope Risk Review is a production-ready MVP for subcontractors who need to co
 - Protected app routes under `/app`
 - Dashboard at `/app/dashboard`
 - New project flow at `/app/projects/new`
-- Document upload/classification/delete page at `/app/projects/[projectId]/upload`
-- Intake checklist at `/app/projects/[projectId]/questions`
-- Processing page at `/app/projects/[projectId]/processing`
-- Web report and download center at `/app/projects/[projectId]/report`
+- Single package upload/classification/delete page at `/app/projects/[projectId]/upload`
+- Review Package page at `/app/projects/[projectId]/questions` with classified files, trade detection, review focus, and automatic report forwarding
+- Compatibility redirect at `/app/projects/[projectId]/processing`
+- Prioritized web report and download center at `/app/projects/[projectId]/report`
 - PDF download route using Playwright
 - CSV issue log download route
 - Delete generated reports and delete full project actions
 - Signed email/password sessions and per-user/per-organization local persistence fallback
 - Supabase schema in `supabase/schema.sql`
 - Structured analysis JSON validation in `lib/analysis-schema.ts`
+- Document classifier in `lib/document-classifier.ts`
+- Trade detector and lightweight trade modules in `lib/trade-detector.ts` and `lib/trade-review.ts`
 
 ## Environment Variables
 
@@ -98,6 +100,7 @@ For Playwright PDF generation on serverless, keep the `playwright` dependency in
 - Local fallback storage or Vercel Runtime Cache is used unless Supabase persistence is configured with the included schema.
 - Uploaded binary files are stored locally in dev; production should use Supabase Storage private buckets.
 - PDF/DOCX/XLSX/OCR extraction is scaffolded but not fully implemented.
+- Trade-specific modules currently cover electrical and windows. Other trades route through the general review until their modules are added.
 - The analysis engine is deterministic and validates structured JSON; an LLM provider can replace or augment it later.
 - Local AHJ requirements are phrased as verification prompts, not verified legal claims.
 - Access control is enforced by signed sessions and ownership checks in local mode; Supabase RLS policies are provided for production.
