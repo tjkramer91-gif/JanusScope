@@ -1,15 +1,24 @@
-# SubScope Risk Review
+# JanusScope
 
-SubScope Risk Review is a production-ready MVP for subcontractors who need to compare a GC subcontract against what they actually priced before signing. It uses Next.js App Router, TypeScript, Tailwind CSS, Zod validation, email/password authentication, Supabase-backed project storage, server-side project access checks, Playwright PDF generation, and CSV issue-log export.
+JanusScope is an AI construction help platform for scope, contracts, bids, RFIs, change orders, budgets, project communication, and practical risk review. The current MVP keeps the proven SubScope package review engine, then adds the broader JanusScope workbench with guided workflows, Ask Janus, a prompt library, templates, projects, reports, consulting request, and settings surfaces. It uses Next.js App Router, TypeScript, Tailwind CSS, Zod validation, email/password authentication, Supabase-backed project storage, server-side project access checks, Playwright PDF generation, and CSV issue-log export.
 
 ## What Was Built
 
-- Public landing page at `/` with plain contractor-focused copy and sample report CTA
+- Public JanusScope landing page at `/`
 - Security and data handling page at `/security`
 - Auth routes at `/auth/login`, `/auth/signup`, and `/auth/logout`
+- Route aliases for `/login`, `/dashboard`, `/ask`, `/workflows`, `/prompts`, `/templates`, `/projects`, `/reports`, `/consulting`, and `/settings`
 - Temporary demo access from login/signup for product-flow testing
 - Protected app routes under `/app`
-- Dashboard at `/app/dashboard`
+- Dashboard at `/app/dashboard` with job-to-be-done workflow cards
+- Ask Janus workbench at `/app/ask`
+- Workflow list and detail pages at `/app/workflows` and `/app/workflows/[workflowSlug]`
+- Prompt library at `/app/prompts`
+- Template library at `/app/templates`
+- Project list and project detail hub at `/app/projects` and `/app/projects/[projectId]`
+- Reports and export index at `/app/reports`
+- Consulting request draft form at `/app/consulting`
+- Settings and beta data-handling notes at `/app/settings`
 - New project flow at `/app/projects/new`
 - Single package upload/classification/delete page at `/app/projects/[projectId]/upload`
 - Review Package page at `/app/projects/[projectId]/questions` with classified files, trade detection, review focus, and automatic report forwarding
@@ -113,4 +122,4 @@ For Playwright PDF generation on serverless, keep the `playwright` dependency in
 - Add signed Supabase download URLs for document/report files.
 - Add end-to-end Playwright tests for a second user access-denial scenario.
 
-SubScope is not a replacement for an attorney. It helps subcontractors identify issues, ask better questions, preserve exclusions, and avoid signing a subcontract that does not match what they priced.
+JanusScope is not a replacement for an attorney, estimator, project manager, superintendent, or professional judgment. It helps construction teams ask better questions, organize risk, preserve assumptions, and create cleaner project communication before issues get expensive.

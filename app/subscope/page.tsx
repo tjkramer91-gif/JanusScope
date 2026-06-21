@@ -36,7 +36,7 @@ export default function SubScopePage() {
               Platform
             </Link>
             <Link href="/auth/login?returnTo=/app/dashboard" className="button-primary px-5 py-2.5">
-              Open SubScope
+              Open JanusScope
             </Link>
           </nav>
         </div>

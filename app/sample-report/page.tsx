@@ -15,12 +15,12 @@ export default function SampleReportPage() {
       <header className="border-b border-line/45 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-5 py-4">
           <Link href="/" className="font-bold text-ink">JanusScope</Link>
-          <Link href="/auth/login?returnTo=/app/projects/new" className="button-primary">Try SubScope</Link>
+          <Link href="/auth/login?returnTo=/app/projects/new" className="button-primary">Start Reviewing</Link>
         </div>
       </header>
       <div className="mx-auto max-w-[1220px] space-y-8 px-5 py-10">
         <div>
-          <p className="eyebrow">SubScope sample report</p>
+          <p className="eyebrow">Sample report</p>
           <h1 className="mt-2 text-3xl font-semibold text-ink">Demo subcontract risk output</h1>
         </div>
         <RiskSummary project={project} review={review} />

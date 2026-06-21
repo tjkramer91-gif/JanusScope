@@ -48,7 +48,7 @@ export default async function ReportPage({ params }: { params: Promise<{ project
             <p className="eyebrow">Step 4</p>
             <SeverityBadge severity={review.overallRating} />
           </div>
-          <h1 className="mt-2 text-3xl font-semibold text-ink">SubScope risk output</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-ink">JanusScope risk output</h1>
           <p className="mt-2 text-sm text-moss">
             Generated {new Date(review.generatedAt).toLocaleString()} · {review.issueLog.length} open issue log items
           </p>

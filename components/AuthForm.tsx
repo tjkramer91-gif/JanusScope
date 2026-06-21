@@ -18,7 +18,7 @@ export function AuthForm({ mode, returnTo }: { mode: "login" | "signup"; returnT
       <div>
         <p className="eyebrow">{isLogin ? "Log in" : "Create account"}</p>
         <h1 className="mt-2 text-3xl font-semibold text-ink">
-          {isLogin ? "Access your SubScope workspace" : "Create your SubScope account"}
+          {isLogin ? "Access your JanusScope workspace" : "Create your JanusScope account"}
         </h1>
         <p className="mt-3 text-sm leading-6 text-moss">
           Use email and password before opening project workspaces, uploads, reports, or dashboard data.

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "JanusScope",
-  description: "Construction document review and project intelligence, starting with SubScope for subcontractors.",
+  description: "AI construction help for scope, contracts, bids, RFIs, change orders, budgets, and project risk.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

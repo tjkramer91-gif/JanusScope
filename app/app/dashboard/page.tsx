@@ -5,9 +5,9 @@ import { StatusBanner } from "@/components/StatusBanner";
 import { SubScopeMemory } from "@/components/SubScopeMemory";
 import { PROJECT_STATUS_LABELS } from "@/lib/catalogs";
 import { formatCurrency } from "@/lib/format";
+import { DASHBOARD_WORK_ITEMS, WORKFLOWS } from "@/lib/platform-content";
 import { requireUser } from "@/lib/server/auth";
 import { listProjects } from "@/lib/server/store";
-import { SUBSCOPE_REVIEW_AREAS } from "@/lib/subscope-content";
 
 export default async function DashboardPage({
   searchParams,
@@ -19,16 +19,16 @@ export default async function DashboardPage({
   const projects = await listProjects(user);
   const reportReadyCount = projects.filter((project) => project.status === "report-ready").length;
   const uploadedCount = projects.filter((project) => project.uploadedFiles.length > 0).length;
-  const openRiskCount = projects.reduce((count, project) => count + (project.riskScore ? Math.max(1, Math.round(project.riskScore / 20)) : 0), 0);
+  const activeCount = projects.filter((project) => project.status !== "report-ready").length;
 
   return (
     <div className="mx-auto max-w-[1220px] space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">SubScope dashboard</p>
-          <h1 className="mt-2 text-3xl font-semibold text-ink">Contract and scope review workspace</h1>
+          <p className="eyebrow">Dashboard</p>
+          <h1 className="mt-2 text-3xl font-semibold text-ink">What are you trying to work on today?</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-            Track subcontract reviews, compare GC terms against your bid, and keep questions visible before execution.
+            Start with a construction task, ask Janus a question, or open a saved project. Contract package review is one workflow inside the broader JanusScope workbench.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -47,16 +47,37 @@ export default async function DashboardPage({
 
       <section className="grid gap-4 md:grid-cols-3">
         {[
-          ["Active reviews", projects.length],
-          ["Packages with documents", uploadedCount],
+          ["Saved projects", projects.length],
+          ["Active work", activeCount],
           ["Reports ready", reportReadyCount],
         ].map(([label, value]) => (
           <div className="card p-7" key={label}>
             <p className="text-xs font-semibold uppercase text-moss">{label}</p>
             <p className="mt-3 text-4xl font-semibold text-ink">{value}</p>
-            <p className="mt-2 text-sm leading-6 text-moss">SubScope project data in this workspace.</p>
+            <p className="mt-2 text-sm leading-6 text-moss">Current JanusScope workspace activity.</p>
           </div>
         ))}
+      </section>
+
+      <section className="card p-8 sm:p-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow">Workflows</p>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">Pick the job to be done</h2>
+          </div>
+          <Link className="button-secondary" href="/app/workflows">
+            View All Workflows
+          </Link>
+        </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {DASHBOARD_WORK_ITEMS.map(([title, body, href]) => (
+            <Link className="rounded-[22px] border border-line/60 bg-paper p-5 hover:border-steel hover:bg-white" href={href} key={title}>
+              <h3 className="font-semibold text-ink">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-moss">{body}</p>
+              <span className="mt-4 inline-flex text-sm font-semibold text-steel">Start workflow</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
@@ -65,18 +86,18 @@ export default async function DashboardPage({
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="eyebrow">Projects</p>
-                <h2 className="mt-2 text-2xl font-semibold text-ink">SubScope reviews</h2>
+                <h2 className="mt-2 text-2xl font-semibold text-ink">Saved project work</h2>
               </div>
               <span className="rounded-full border border-line/60 bg-paper px-4 py-2 text-xs font-semibold text-moss">
-                {openRiskCount} tracked risk signals
+                {uploadedCount} with documents
               </span>
             </div>
           </div>
           {projects.length === 0 ? (
             <div className="p-10 text-center">
-              <p className="font-semibold text-ink">No SubScope projects yet.</p>
+              <p className="font-semibold text-ink">No projects yet.</p>
               <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-moss">
-                Create a project to upload documents, compare scope and contract language, and generate a report-style risk output.
+                Create a project to upload documents, run the package review, and keep reports tied to the right user and project.
               </p>
               <Link href="/app/projects/new" className="button-primary mt-5">
                 Create Project
@@ -93,7 +114,7 @@ export default async function DashboardPage({
                 <thead className="bg-paper/70 text-xs uppercase text-moss">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Project</th>
-                    <th className="px-4 py-3 font-semibold">GC</th>
+                    <th className="px-4 py-3 font-semibold">Client / GC</th>
                     <th className="px-4 py-3 font-semibold">Trade</th>
                     <th className="px-4 py-3 font-semibold">Amount</th>
                     <th className="px-4 py-3 font-semibold">Status</th>
@@ -108,8 +129,8 @@ export default async function DashboardPage({
                         <p className="font-semibold text-ink">{project.name}</p>
                         <p className="text-xs text-moss">{project.city}, {project.state}</p>
                       </td>
-                      <td className="px-4 py-4 text-moss">{project.gcName}</td>
-                      <td className="px-4 py-4 text-moss">{project.tradeType}</td>
+                      <td className="px-4 py-4 text-moss">{project.gcName || project.ownerName || "Not set"}</td>
+                      <td className="px-4 py-4 text-moss">{project.tradeType || "Not set"}</td>
                       <td className="px-4 py-4 text-moss">{formatCurrency(project.contractAmount)}</td>
                       <td className="px-4 py-4">{PROJECT_STATUS_LABELS[project.status]}</td>
                       <td className="px-4 py-4 text-moss">
@@ -132,16 +153,16 @@ export default async function DashboardPage({
         </div>
 
         <section className="card p-8 sm:p-10">
-          <p className="eyebrow">Review package</p>
-          <h2 className="mt-2 text-2xl font-semibold text-ink">Comparison coverage</h2>
+          <p className="eyebrow">Platform coverage</p>
+          <h2 className="mt-2 text-2xl font-semibold text-ink">Initial JanusScope workflows</h2>
           <p className="mt-3 text-sm leading-6 text-moss">
-            SubScope is focused on the checks subcontractors need before signing. These are not legal conclusions.
+            The current product now starts from common construction jobs and keeps SubScope package review available as the contract review path.
           </p>
           <div className="mt-6 grid gap-3">
-            {SUBSCOPE_REVIEW_AREAS.slice(0, 7).map((area) => (
-              <div className="rounded-[20px] border border-line/60 bg-paper px-5 py-4" key={area}>
-                <p className="text-sm font-semibold text-ink">{area}</p>
-              </div>
+            {WORKFLOWS.slice(0, 7).map((workflow) => (
+              <Link className="rounded-[20px] border border-line/60 bg-paper px-5 py-4 hover:bg-white" href={`/app/workflows/${workflow.slug}`} key={workflow.slug}>
+                <p className="text-sm font-semibold text-ink">{workflow.title}</p>
+              </Link>
             ))}
           </div>
         </section>

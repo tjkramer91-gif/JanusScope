@@ -73,7 +73,7 @@ export function buildTextReport(project: Project, review: RiskReview): string {
     "ASSUMPTIONS",
     ...review.assumptions.map((assumption, index) => `${index + 1}. ${assumption.statement} (${assumption.basis})`),
     "",
-    "SubScope is a pre-execution construction risk review assistant, not legal advice.",
+    "JanusScope is a construction risk review assistant, not legal advice.",
   ];
 
   return lines.join("\n");
@@ -134,7 +134,7 @@ export function buildHtmlReport(project: Project, review: RiskReview): string {
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>${escapeHtml(project.name || "SubScope Risk Output")}</title>
+  <title>${escapeHtml(project.name || "JanusScope Risk Output")}</title>
   <style>
     body { font-family: Arial, sans-serif; color: #1f2328; margin: 32px; line-height: 1.45; }
     @page { margin: 0.65in; @bottom-center { content: "Page " counter(page) " of " counter(pages); } }
@@ -154,13 +154,13 @@ export function buildHtmlReport(project: Project, review: RiskReview): string {
 <body>
   <section class="cover">
     <p>Generated ${escapeHtml(new Date(review.generatedAt).toLocaleDateString("en-US"))}</p>
-    <h1>SubScope Risk Output</h1>
+    <h1>JanusScope Risk Output</h1>
     <p>${escapeHtml(project.name || "Unnamed project")}</p>
     <p class="risk">${review.score}/100</p>
     <p><strong>${escapeHtml(review.riskLevel)}</strong></p>
     <p>${escapeHtml(review.finalRecommendation)}</p>
   </section>
-  <h1>SubScope Risk Output</h1>
+  <h1>JanusScope Risk Output</h1>
   <div class="meta">
     <div><strong>Project:</strong> ${escapeHtml(project.name || "Unnamed project")}</div>
     <div><strong>Address:</strong> ${escapeHtml(project.projectAddress || "Not provided")}</div>
@@ -199,7 +199,7 @@ export function buildHtmlReport(project: Project, review: RiskReview): string {
     <thead><tr><th>ID</th><th>Category</th><th>Risk</th><th>Description</th><th>Recommended clarification</th></tr></thead>
     <tbody>${renderRows}</tbody>
   </table>
-  <p><small>SubScope is a pre-execution construction risk review assistant, not legal advice.</small></p>
+  <p><small>JanusScope is a construction risk review assistant, not legal advice.</small></p>
 </body>
 </html>`;
 }

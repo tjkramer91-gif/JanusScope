@@ -14,7 +14,7 @@ export default function SecurityPage() {
       <header className="border-b border-line/45 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1080px] items-center justify-between px-5 py-4">
           <Link href="/" className="font-semibold text-ink">JanusScope</Link>
-          <Link href="/auth/login?returnTo=/app/dashboard" className="button-secondary">Open SubScope</Link>
+          <Link href="/auth/login?returnTo=/app/dashboard" className="button-secondary">Open JanusScope</Link>
         </div>
       </header>
       <section className="mx-auto max-w-[1080px] px-5 py-20 lg:py-24">
@@ -23,7 +23,7 @@ export default function SecurityPage() {
           Built around private construction documents and clear customer controls.
         </h1>
         <p className="mt-5 max-w-3xl text-sm leading-6 text-moss">
-          SubScope is a construction risk review assistant. It is not a lawyer replacement, and security controls should stay visible because contracts, bids, drawings, and pricing are sensitive.
+          JanusScope is a construction risk and workflow assistant. It is not a lawyer replacement, and security controls should stay visible because contracts, bids, drawings, and pricing are sensitive.
         </p>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2">

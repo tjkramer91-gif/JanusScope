@@ -10,10 +10,10 @@ export default async function NewProjectPage({ searchParams }: { searchParams: P
     <form action={createProjectAction} className="mx-auto max-w-[1120px] space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">Step 1</p>
-          <h1 className="mt-2 text-3xl font-semibold text-ink">Create SubScope project</h1>
+          <p className="eyebrow">Project setup</p>
+          <h1 className="mt-2 text-3xl font-semibold text-ink">Create JanusScope project</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-moss">
-            Add the basic project context. If you do not know the trade yet, JanusScope will infer it from the package.
+            Add the basic project context for document review, workflow outputs, reports, and project memory. If you do not know the trade yet, JanusScope will infer it from the package.
           </p>
         </div>
         <PendingSubmitButton className="button-primary" pendingLabel="Creating project...">
