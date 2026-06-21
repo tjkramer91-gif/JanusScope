@@ -27,11 +27,11 @@ describe("buildSourceVerification", () => {
     expect(report.summary.documentsReviewed).toBe(6);
     expect(report.documentAudit.every((document) => document.includedInFinalReview)).toBe(true);
     expect(report.externalSourcesChecked).toHaveLength(2);
-    expect(report.externalSourcesChecked[0]?.url).toContain("mesaaz.gov");
+    expect(report.externalSourcesChecked[0]?.url).toContain("example.com");
 
     const pricing = report.findings.find((finding) => finding.id === "pricing-subpanel-budget-gap");
-    expect(pricing?.sourceLocation).toContain("owner-budget-electrical.csv row 2");
-    expect(pricing?.sourceLocation).toContain("subcontractor-bid-electrical.csv row 2");
+    expect(pricing?.sourceLocation).toContain("fictional-owner-budget-electrical.csv row 2");
+    expect(pricing?.sourceLocation).toContain("fictional-subcontractor-bid-electrical.csv row 2");
     expect(pricing?.costOrScheduleImpact).toContain("$117,800");
     expect(pricing?.confidence).toBe("High");
 

@@ -33,7 +33,7 @@ export default async function NewProjectPage({ searchParams }: { searchParams: P
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <label className="md:col-span-2">
             <span className="field-label">Project name</span>
-            <input className="field" name="name" required placeholder="Mesa Apartments Phase 2" />
+            <input className="field" name="name" required placeholder="Harbor Flats Renovation" />
           </label>
           <label>
             <span className="field-label">GC name</span>

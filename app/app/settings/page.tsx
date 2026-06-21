@@ -1,3 +1,10 @@
+import {
+  DEVELOPER_CONTENT_SAFETY_RULE,
+  FAKE_SAMPLE_DATA_TRUST_NOTE,
+  PRODUCT_PRINCIPLE,
+  USE_FAKE_SAMPLE_DATA_ONLY,
+} from "@/lib/content-safety";
+
 export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-[1120px] space-y-8">
@@ -12,7 +19,7 @@ export default function SettingsPage() {
       <section className="card p-8 sm:p-10">
         <h2 className="section-title">Data handling note</h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-moss">
-          Your project documents may contain sensitive information. JanusScope is designed to help review and organize construction information. Do not upload documents you are not authorized to review. During beta, confirm storage and retention settings before using JanusScope for confidential projects.
+          {FAKE_SAMPLE_DATA_TRUST_NOTE} Your project documents may contain sensitive information. JanusScope is designed to help review and organize construction information. Do not upload documents you are not authorized to review. During beta, confirm storage and retention settings before using JanusScope for confidential projects.
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {["Delete uploaded documents", "Delete project", "Export project", "User-controlled retention", "Admin data deletion", "Clear file storage paths"].map((control) => (
@@ -21,6 +28,23 @@ export default function SettingsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="card p-8 sm:p-10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="section-title">Sample data safety</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-moss">
+              {DEVELOPER_CONTENT_SAFETY_RULE}
+            </p>
+          </div>
+          <span className="rounded-full border border-line/60 bg-paper px-4 py-2 text-xs font-semibold text-moss">
+            USE_FAKE_SAMPLE_DATA_ONLY = {String(USE_FAKE_SAMPLE_DATA_ONLY)}
+          </span>
+        </div>
+        <p className="mt-6 rounded-[20px] border border-line/60 bg-paper p-5 text-sm font-semibold leading-6 text-ink">
+          {PRODUCT_PRINCIPLE}
+        </p>
       </section>
 
       <section className="card p-8 sm:p-10">

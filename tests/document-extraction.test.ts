@@ -27,7 +27,7 @@ describe("document extraction", () => {
   });
 
   it("classifies owner budgets and pricing references from filenames", () => {
-    expect(documentCategoryFor("other", "owner-budget-electrical.csv")).toBe("Budget");
+    expect(documentCategoryFor("other", "fictional-owner-budget-electrical.csv")).toBe("Budget");
     expect(documentCategoryFor("other", "sample-pricing-reference.csv")).toBe("Pricing reference");
   });
 });

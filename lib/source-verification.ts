@@ -114,25 +114,25 @@ interface EvidenceMatch {
 
 const UNABLE_TO_VERIFY = "Unable to verify with the documents and sources currently available.";
 
-const MESA_EXTERNAL_SOURCES = [
+const EXAMPLE_CITY_EXTERNAL_SOURCES = [
   {
-    id: "mesa-building-permit-plan-review",
-    sourceTitle: "City of Mesa Building Permit and Plan Review",
-    url: "https://www.mesaaz.gov/Business-Development/Development-Services/Building-Permit-Plan-Review",
-    publisher: "City of Mesa Development Services",
+    id: "example-city-building-permit-plan-review",
+    sourceTitle: "Example City Building Permit and Plan Review",
+    url: "https://example.com/example-city-building-permits",
+    publisher: "Example City Building Department",
     factChecked:
-      "Mesa adopted the 2024 ICC family of codes and the 2023 NEC, with the adopted codes effective January 8, 2026.",
-    sourceType: "Official AHJ source",
+      "Fictional sample source states that permit scope, adopted code basis, and inspection sequencing must be confirmed before work starts.",
+    sourceType: "Fictional AHJ sample source",
     confidence: "High" as const,
   },
   {
-    id: "mesa-construction-inspections",
-    sourceTitle: "City of Mesa Construction Inspections",
-    url: "https://www.mesaaz.gov/Business-Development/Development-Services/Construction-Inspections",
-    publisher: "City of Mesa Development Services",
+    id: "example-city-construction-inspections",
+    sourceTitle: "Example City Construction Inspections",
+    url: "https://example.com/example-city-inspections",
+    publisher: "Example City Building Department",
     factChecked:
-      "Permits are not completed until required inspections are conducted and construction is approved; inspections are requested before concealment or cover.",
-    sourceType: "Official AHJ source",
+      "Fictional sample source states that inspections should be requested before concealed work is covered.",
+    sourceType: "Fictional AHJ sample source",
     confidence: "High" as const,
   },
 ];
@@ -255,10 +255,10 @@ function hasEvidenceCategory(documents: EvidenceDocument[], category: Verificati
   return documents.some((document) => document.category === category);
 }
 
-function mesaSourceChecks(project: Project, dateAccessed: string): ExternalSourceCheck[] {
-  const isMesa = project.city.trim().toLowerCase() === "mesa" && project.state.trim().toLowerCase() === "az";
-  if (!isMesa) return [];
-  return MESA_EXTERNAL_SOURCES.map((source) => ({ ...source, dateAccessed }));
+function exampleCitySourceChecks(project: Project, dateAccessed: string): ExternalSourceCheck[] {
+  const isExampleCity = project.city.trim().toLowerCase() === "example city" && project.state.trim().toLowerCase() === "st";
+  if (!isExampleCity) return [];
+  return EXAMPLE_CITY_EXTERNAL_SOURCES.map((source) => ({ ...source, dateAccessed }));
 }
 
 function buildDocumentAudit(project: Project): DocumentAuditItem[] {
@@ -517,16 +517,16 @@ function addContractReview(
 }
 
 function addAhjFinding(findings: SourceBackedFinding[], externalSources: ExternalSourceCheck[]) {
-  const buildingSource = externalSources.find((source) => source.id === "mesa-building-permit-plan-review");
+  const buildingSource = externalSources.find((source) => source.id === "example-city-building-permit-plan-review");
   if (!buildingSource) return;
 
   findings.push({
-    id: "mesa-permit-code-source",
-    title: "Mesa permit and code basis needs project-specific confirmation",
+    id: "example-city-permit-code-source",
+    title: "Example City permit and code basis needs project-specific confirmation",
     category: "AHJ / permitting",
     risk: "Medium",
     confidence: "High",
-    confidenceReason: "The finding uses an official City of Mesa source, not an inferred code requirement.",
+    confidenceReason: "The finding uses a fictional sample AHJ source package, not a real project or real jurisdiction claim.",
     sourceDocument: buildingSource.sourceTitle,
     sourceLocation: buildingSource.url,
     extractedText: buildingSource.factChecked,
@@ -534,7 +534,7 @@ function addAhjFinding(findings: SourceBackedFinding[], externalSources: Externa
       "The official AHJ page identifies the adopted code basis, but the uploaded package does not prove which project permits or inspections are required.",
     costOrScheduleImpact:
       "Permit or inspection requirements can affect start dates, concealed work sequencing, closeout, and responsibility for fees.",
-    recommendedAction: "Confirm permit scope, inspection sequence, and fee responsibility with Mesa Development Services and the GC.",
+    recommendedAction: "Confirm permit scope, inspection sequence, and fee responsibility with the actual AHJ and the GC.",
     followUpQuestion: "Which permit and inspection obligations are assigned to the electrical subcontractor in the executed documents?",
   });
 }
@@ -606,7 +606,7 @@ export function buildSourceVerification(project: Project, options: { now?: Date 
   const dateAccessed = generatedAt.slice(0, 10);
   const documents = makeEvidenceDocuments(project);
   const documentAudit = buildDocumentAudit(project);
-  const externalSourcesChecked = mesaSourceChecks(project, dateAccessed);
+  const externalSourcesChecked = exampleCitySourceChecks(project, dateAccessed);
   const findings: SourceBackedFinding[] = [];
   const comparisonMatrix: DocumentComparisonMatrixRow[] = [];
   const contractRequirementReview: ContractRequirementFinding[] = [];

@@ -69,11 +69,103 @@ Open the local URL printed by Next.js. It defaults to `http://localhost:3000` wh
 Quality checks:
 
 ```bash
+npm run check-sensitive-content
 npm run typecheck
 npm run lint
 npm test
 npm run build
 ```
+
+## Content Safety And Sample Data Rules
+
+JanusScope must not ship with any proprietary, confidential, employer-derived, client-derived, or project-specific data. All examples must be fictional. Do not use real project names, addresses, companies, people, bid numbers, budgets, scope language, file names, contract terms, screenshots, templates, seed records, or uploaded documents from any employer or client.
+
+The product rule is:
+
+`USE_FAKE_SAMPLE_DATA_ONLY = true`
+
+When this is enabled:
+
+- Only fictional sample data may appear in the product
+- Demo projects must be fictional
+- Template examples must be fictional
+- Placeholder names must be fictional
+- Seed files must be fictional
+- Screenshots must be fictional
+- Onboarding examples must be fictional
+
+Use clearly fictional examples such as `Harbor Flats Renovation`, `Cedar Ridge Apartments`, `Example Builders LLC`, `Acme Electrical Services`, `Sample Housing Partners`, `Placeholder Design Group`, `123 Example Avenue, Example City, ST 00000`, `Jordan Smith`, `Casey Miller`, `estimator@examplebuilders.com`, and `555-0100`.
+
+Acceptable sample scope language:
+
+> Replace existing unit electrical panels where noted. Include labor, material, permit coordination, patching directly related to panel replacement, and cleanup. Excludes utility company fees unless specifically stated.
+
+Developer rule:
+
+When creating default examples, prompts, templates, workflows, placeholder documents, seed database content, demos, or screenshots, generate fictional data from scratch. Do not use names, details, addresses, file structures, contract terms, project titles, pricing, or wording from real employers, real clients, real projects, or user conversations.
+
+Product principle:
+
+JanusScope should not pretend to be smarter than experienced construction professionals. It should help preserve, organize, and scale the kind of judgment experienced construction people use when reviewing scope, contracts, budgets, field issues, and project risk.
+
+User-facing trust note:
+
+JanusScope examples use fictional project names, companies, addresses, people, and sample data. Users are responsible for ensuring they have authorization to upload and review any project documents they use inside the platform.
+
+## Sensitive Content Check
+
+Run this before committing or deploying:
+
+```bash
+npm run check-sensitive-content
+```
+
+The scanner reads banned terms from `scripts/sensitive-keywords.txt`. Add employer, client, project, address, file-name, and sensitive internal keywords there as needed. The script scans source code, seed/sample data, markdown files, text public assets, and file paths. It fails with the file and line number for any match.
+
+The scanner intentionally ignores its own keyword list and this README validation block so the required policy checklist can mention banned terms without making the repo permanently fail.
+
+## Sample Data Validation Checklist
+
+Before release, confirm:
+
+<!-- sensitive-content-check: allow-start -->
+- No ICON National references
+- No ICON Builders references
+- No Wilshire Pacific Builders references
+- No April Housing references
+- No Belton Woods references
+<!-- sensitive-content-check: allow-end -->
+- No real project names
+- No real addresses
+- No real employees
+- No real subcontractors
+- No real owners, developers, architects, or consultants
+- No real phone numbers
+- No real emails
+- No real budget data
+- No real subcontractor pricing
+- No copied contract language
+- No copied proposal language
+- No copied scope sheets
+- No copied bid tabs
+- No copied internal file names
+- No uploaded documents included in the public repo
+- No sensitive data in commits
+- No sensitive data in screenshots
+- No sensitive data in seed files
+- No sensitive data in demo accounts
+
+## Before Deploying JanusScope
+
+1. Run the sensitive content check.
+2. Review seed data manually.
+3. Review public screenshots manually.
+4. Review sample templates manually.
+5. Confirm no proprietary or employer-derived material is included.
+6. Confirm all sample data is fictional.
+7. Confirm uploaded user files are not committed to the repository.
+8. Confirm environment variables are not committed.
+9. Confirm storage and retention behavior is documented.
 
 ## Supabase Setup
 

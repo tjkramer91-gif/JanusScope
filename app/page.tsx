@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FAKE_SAMPLE_DATA_TRUST_NOTE, KNOWLEDGE_PRESERVATION_BULLETS } from "@/lib/content-safety";
 import { HOW_JANUS_WORKS, LANDING_HELP_AREAS, USER_TYPES, WORKFLOWS } from "@/lib/platform-content";
 
 const PROMISE_LINES = ["Better questions.", "Cleaner scopes.", "Fewer expensive surprises."];
@@ -34,6 +35,9 @@ export default function LandingPage() {
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-moss">
               Find the miss before it costs you. JanusScope helps construction teams review documents, ask better questions, create cleaner project communication, and catch risk hiding in unclear scope, bad assumptions, and rushed decisions.
+            </p>
+            <p className="mt-4 max-w-3xl text-base font-semibold leading-7 text-ink">
+              Construction experience is getting harder to replace. JanusScope helps teams keep the judgment moving.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link className="button-primary px-6 py-3" href="/auth/login?returnTo=/app/dashboard">
@@ -72,6 +76,28 @@ export default function LandingPage() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-line/45 bg-white">
+        <div className="mx-auto grid max-w-[1180px] gap-10 px-5 py-20 lg:grid-cols-[0.85fr_1.15fr] lg:px-8 lg:py-24">
+          <div>
+            <p className="eyebrow">Institutional knowledge</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-normal text-ink">Construction knowledge is leaving the industry.</h2>
+            <p className="mt-4 text-sm leading-6 text-moss">
+              Experienced estimators, project managers, superintendents, and preconstruction leaders are retiring, changing roles, or leaving the industry faster than companies can replace them. JanusScope helps teams preserve practical construction judgment by turning common review habits into guided AI workflows, prompts, templates, and checklists.
+            </p>
+            <p className="mt-4 text-sm font-semibold leading-6 text-ink">
+              Built for the gray areas where scope, contracts, budgets, bids, RFIs, change orders, and field realities do not line up cleanly.
+            </p>
+          </div>
+          <div className="grid gap-3">
+            {KNOWLEDGE_PRESERVATION_BULLETS.map((bullet) => (
+              <div className="rounded-[20px] border border-line/60 bg-paper p-5 text-sm font-semibold leading-6 text-ink" key={bullet}>
+                {bullet}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -163,7 +189,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="mx-auto max-w-[1180px] px-5 py-10 text-xs leading-5 text-moss lg:px-8">
-        Your project documents may contain sensitive information. Do not upload documents you are not authorized to review. During beta, confirm storage and retention settings before using JanusScope for confidential projects.
+        {FAKE_SAMPLE_DATA_TRUST_NOTE} Your project documents may contain sensitive information. Do not upload documents you are not authorized to review. During beta, confirm storage and retention settings before using JanusScope for confidential projects.
       </footer>
     </main>
   );

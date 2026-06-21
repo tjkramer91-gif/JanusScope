@@ -1,0 +1,7 @@
+# One banned keyword or phrase per line.
+# Keep this list focused on employer, client, project, address, and other sensitive terms that must never ship in source, sample data, screenshots, or public assets.
+ICON National
+ICON Builders
+Wilshire Pacific Builders
+April Housing
+Belton Woods

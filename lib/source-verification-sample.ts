@@ -10,7 +10,7 @@ export interface SourceVerificationSampleDocument {
 
 export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocument[] = [
   {
-    name: "owner-budget-electrical.csv",
+    name: "fictional-owner-budget-electrical.csv",
     type: "text/csv",
     documentId: "other",
     content: [
@@ -20,7 +20,7 @@ export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocum
     ].join("\n"),
   },
   {
-    name: "subcontractor-bid-electrical.csv",
+    name: "fictional-subcontractor-bid-electrical.csv",
     type: "text/csv",
     documentId: "bid-proposal",
     content: [
@@ -30,7 +30,7 @@ export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocum
     ].join("\n"),
   },
   {
-    name: "owner-scope-electrical.csv",
+    name: "fictional-owner-scope-electrical.csv",
     type: "text/csv",
     documentId: "scope-letter",
     content: [
@@ -39,7 +39,7 @@ export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocum
     ].join("\n"),
   },
   {
-    name: "gc-subcontract-language.csv",
+    name: "fictional-contract-language.csv",
     type: "text/csv",
     documentId: "gc-subcontract",
     content: [
@@ -51,13 +51,13 @@ export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocum
     ].join("\n"),
   },
   {
-    name: "mesa-ahj-source.csv",
+    name: "example-city-ahj-source.csv",
     type: "text/csv",
     documentId: "permit-ahj",
     content: [
       "source,fact",
-      "City of Mesa Building Permit and Plan Review,Mesa adopted the 2024 ICC family of codes and 2023 NEC; project-specific permit requirements must be confirmed with Development Services.",
-      "City of Mesa Construction Inspections,Permits are not complete until required inspections are conducted and construction is approved.",
+      "Example City Building Permit and Plan Review,Fictional sample source states that permit scope adopted code basis and inspection sequencing must be confirmed before work starts.",
+      "Example City Construction Inspections,Fictional sample source states that inspections should be requested before concealed work is covered.",
     ].join("\n"),
   },
   {
@@ -66,7 +66,7 @@ export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocum
     documentId: "other",
     content: [
       "source,item,unit_price,note",
-      "Internal historical buyout reference,Apartment subpanel,2400,Sample reference for reasonableness only; not an external market quote",
+      "Fictional historical buyout reference,Apartment subpanel,2400,Sample reference for reasonableness only; not an external market quote",
     ].join("\n"),
   },
 ];
@@ -91,14 +91,14 @@ export function sourceVerificationSampleProjectInput(): Omit<
   | "updatedAt"
 > {
   return {
-    name: "Source-backed review sample",
-    projectAddress: "55 W Main St",
-    city: "Mesa",
-    state: "AZ",
-    zip: "85201",
+    name: "Harbor Flats Renovation source-backed sample",
+    projectAddress: "123 Example Avenue",
+    city: "Example City",
+    state: "ST",
+    zip: "00000",
     tradeType: "Electrical",
-    gcName: "Sample GC",
-    ownerName: "Sample Owner",
+    gcName: "Example Builders LLC",
+    ownerName: "Sample Housing Partners",
     contractAmount: 525000,
     bidDate: "2026-06-01",
     executionDeadline: "2026-06-30",
