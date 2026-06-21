@@ -55,6 +55,32 @@ describe("trade routing and priority output", () => {
     expect(findings.every((finding) => finding.trade === "Windows")).toBe(true);
   });
 
+  it("applies trade-specific library modules beyond electrical and windows", () => {
+    const scenarios = [
+      ["Plumbing", "plumbing fixture shutoff access panels pressure testing"],
+      ["HVAC/mechanical", "HVAC controls balancing roof patching commissioning"],
+      ["Roofing", "roofing membrane flashing deck repair temporary dry-in"],
+      ["Cabinets/countertops", "cabinet countertop casework quartz sink cutouts"],
+      ["Flooring", "flooring LVT carpet floor prep moisture mitigation"],
+      ["Drywall", "drywall gypsum patch texture fire rated assembly"],
+      ["Abatement", "abatement asbestos containment clearance testing"],
+      ["Doors/hardware", "door hardware frame keying access control"],
+      ["Appliances", "appliance refrigerator range dishwasher delivery install"],
+      ["Sitework", "sitework grading storm drain asphalt paving utilities"],
+    ] as const;
+
+    for (const [expectedTrade, notesText] of scenarios) {
+      const project = createEmptyProject({ notesText });
+      const detected = detectTradeScope(project);
+      const findings = buildTradeSpecificReview(project, detected);
+
+      expect(detected.trade).toBe(expectedTrade);
+      expect(tradeModuleStatus(detected.trade)).toContain("module applied");
+      expect(findings.length).toBeGreaterThan(0);
+      expect(findings.every((finding) => finding.trade === detected.trade)).toBe(true);
+    }
+  });
+
   it("puts source-backed and trade-specific misses into top risks", () => {
     const project = createEmptyProject({
       ...sourceVerificationSampleProjectInput(),

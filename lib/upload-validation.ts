@@ -12,6 +12,7 @@ const ALLOWED_UPLOAD_MIME_TYPES = new Set([
 ]);
 
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+export const MAX_UPLOAD_FILES = 20;
 
 export interface UploadFileLike {
   name: string;

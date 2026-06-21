@@ -86,7 +86,7 @@ export default async function UploadPage({
           </label>
           <label className="mt-5 flex items-start gap-3 rounded-[22px] border border-line/60 bg-paper p-5 text-sm text-moss">
             <input type="checkbox" name="deleteDocumentsAfterReport" defaultChecked={project.deleteDocumentsAfterReport} className="mt-1 h-4 w-4 accent-steel" />
-            <span>Delete uploaded documents after report generation. This is a data-control placeholder for the MVP workflow.</span>
+            <span>Delete uploaded source files after report generation. JanusScope keeps the project record, extracted review text, and generated report metadata.</span>
           </label>
         </section>
 

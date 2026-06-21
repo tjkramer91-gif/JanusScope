@@ -8,7 +8,7 @@ JanusScope is an AI construction help platform for scope, contracts, bids, RFIs,
 - Security and data handling page at `/security`
 - Auth routes at `/auth/login`, `/auth/signup`, and `/auth/logout`
 - Route aliases for `/login`, `/dashboard`, `/ask`, `/workflows`, `/prompts`, `/templates`, `/projects`, `/reports`, `/consulting`, and `/settings`
-- Temporary demo access from login/signup for product-flow testing
+- Environment-gated demo access from login/signup for product-flow testing
 - Protected app routes under `/app`
 - Dashboard at `/app/dashboard` with job-to-be-done workflow cards
 - Ask Janus workbench at `/app/ask`
@@ -32,6 +32,7 @@ JanusScope is an AI construction help platform for scope, contracts, bids, RFIs,
 - Structured analysis JSON validation in `lib/analysis-schema.ts`
 - Document classifier in `lib/document-classifier.ts`
 - Trade detector and lightweight trade modules in `lib/trade-detector.ts` and `lib/trade-review.ts`
+- Runtime sensitive-data scanner for local uploads, exports, reports, and `.data/subscope-db.json`
 
 ## Environment Variables
 
@@ -50,7 +51,7 @@ Required for production:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_UPLOAD_BUCKET`
 
-When Supabase variables are missing locally, the app uses `.data/subscope-db.json` and `.data/uploads` so the product flow can be tested without cloud credentials. On Vercel without Supabase, the app uses Vercel Runtime Cache as a temporary shared fallback so the flow does not crash across functions. Production should use Supabase for durable project and document records.
+When Supabase variables are missing locally, the app uses `.data/subscope-db.json` and `.data/uploads` so the product flow can be tested without cloud credentials. Keep that local runtime store sanitized or reset before sharing the workspace. In production on Vercel, JanusScope now fails closed unless Supabase is configured or `ALLOW_RUNTIME_CACHE_STORE_FALLBACK=true` is explicitly set for temporary QA.
 
 ## Run Locally
 
@@ -70,6 +71,7 @@ Quality checks:
 
 ```bash
 npm run check-sensitive-content
+npm run check-runtime-sensitive-data
 npm run typecheck
 npm run lint
 npm test
@@ -78,7 +80,7 @@ npm run build
 
 ## Content Safety And Sample Data Rules
 
-JanusScope must not ship with any proprietary, confidential, employer-derived, client-derived, or project-specific data. All examples must be fictional. Do not use real project names, addresses, companies, people, bid numbers, budgets, scope language, file names, contract terms, screenshots, templates, seed records, or uploaded documents from any employer or client.
+JanusScope must not ship with any proprietary, confidential, employer-derived, client-derived, or project-specific data. All examples must be synthetic. Do not use real project names, addresses, companies, people, bid numbers, budgets, scope language, file names, contract terms, screenshots, templates, seed records, or uploaded documents from any employer or client.
 
 The product rule is:
 
@@ -86,15 +88,15 @@ The product rule is:
 
 When this is enabled:
 
-- Only fictional sample data may appear in the product
-- Demo projects must be fictional
-- Template examples must be fictional
-- Placeholder names must be fictional
-- Seed files must be fictional
-- Screenshots must be fictional
-- Onboarding examples must be fictional
+- Only synthetic sample data may appear in the product
+- Demo projects must be synthetic
+- Template examples must be synthetic
+- Placeholder names must be synthetic
+- Seed files must be synthetic
+- Screenshots must be synthetic
+- Onboarding examples must be synthetic
 
-Use clearly fictional examples such as `Harbor Flats Renovation`, `Cedar Ridge Apartments`, `Example Builders LLC`, `Acme Electrical Services`, `Sample Housing Partners`, `Placeholder Design Group`, `123 Example Avenue, Example City, ST 00000`, `Jordan Smith`, `Casey Miller`, `estimator@examplebuilders.com`, and `555-0100`.
+All demo identities, addresses, pricing examples, and placeholder contacts should come from `lib/synthetic-data.ts`. Approved demo-data files are tracked in `scripts/synthetic-data-approvals.json`.
 
 Acceptable sample scope language:
 
@@ -102,7 +104,7 @@ Acceptable sample scope language:
 
 Developer rule:
 
-When creating default examples, prompts, templates, workflows, placeholder documents, seed database content, demos, or screenshots, generate fictional data from scratch. Do not use names, details, addresses, file structures, contract terms, project titles, pricing, or wording from real employers, real clients, real projects, or user conversations.
+When creating default examples, prompts, templates, workflows, placeholder documents, seed database content, demos, or screenshots, generate synthetic data from scratch. Do not use names, details, addresses, file structures, contract terms, project titles, pricing, or wording from real employers, real clients, real projects, or user conversations.
 
 Product principle:
 
@@ -110,17 +112,29 @@ JanusScope should not pretend to be smarter than experienced construction profes
 
 User-facing trust note:
 
-JanusScope examples use fictional project names, companies, addresses, people, and sample data. Users are responsible for ensuring they have authorization to upload and review any project documents they use inside the platform.
+JanusScope examples use synthetic project names, companies, addresses, people, and sample data. Users are responsible for ensuring they have authorization to upload and review any project documents they use inside the platform.
 
 ## Sensitive Content Check
 
 Run this before committing or deploying:
 
 ```bash
-npm run check-sensitive-content
+npm run privacy:audit
 ```
 
-The scanner reads banned terms from `scripts/sensitive-keywords.txt`. Add employer, client, project, address, file-name, and sensitive internal keywords there as needed. The script scans source code, seed/sample data, markdown files, text public assets, and file paths. It fails with the file and line number for any match.
+The source scanner reads banned terms from `scripts/sensitive-keywords.txt`. Add employer, client, project, address, file-name, and sensitive internal keywords there as needed. It scans source code, seed/sample data, markdown files, text public assets, and file paths. It fails with the file and line number for any match.
+
+The runtime scanner checks `.data/subscope-db.json`, `.data/uploads`, `uploads`, `storage`, `documents`, `exports`, and `reports`. This catches local QA uploads, generated reports, exported CSVs, and runtime database rows before demoing or building.
+
+The scanner also checks for unapproved:
+
+- company-like names
+- postal-address patterns
+- email addresses
+- phone numbers
+- hardcoded dollar amounts
+
+Generic synthetic demo data is allowed only in files approved by `scripts/synthetic-data-approvals.json`.
 
 The scanner intentionally ignores its own keyword list and this README validation block so the required policy checklist can mention banned terms without making the repo permanently fail.
 
@@ -158,14 +172,15 @@ Before release, confirm:
 ## Before Deploying JanusScope
 
 1. Run the sensitive content check.
-2. Review seed data manually.
-3. Review public screenshots manually.
-4. Review sample templates manually.
-5. Confirm no proprietary or employer-derived material is included.
-6. Confirm all sample data is fictional.
-7. Confirm uploaded user files are not committed to the repository.
-8. Confirm environment variables are not committed.
-9. Confirm storage and retention behavior is documented.
+2. Run the runtime sensitive-data check.
+3. Review seed data manually.
+4. Review public screenshots manually.
+5. Review sample templates manually.
+6. Confirm no proprietary or employer-derived material is included.
+7. Confirm all sample data is synthetic.
+8. Confirm uploaded user files are not committed to the repository.
+9. Confirm environment variables are not committed.
+10. Confirm storage and retention behavior is documented.
 
 ## Supabase Setup
 
@@ -175,7 +190,7 @@ Before release, confirm:
 4. Keep `SUPABASE_SERVICE_ROLE_KEY` server-only.
 5. Use signed URLs for temporary downloads in production.
 
-The current local MVP uses `.data/subscope-db.json` and `.data/uploads` as a durable dev fallback so the app works without Supabase credentials. On Vercel, Runtime Cache keeps the flow stable while Supabase is missing, but it is not a database and can evict data.
+The current local MVP uses `.data/subscope-db.json` and `.data/uploads` as a durable dev fallback so the app works without Supabase credentials. Production should use Supabase. Vercel Runtime Cache can be enabled only as an explicit temporary QA fallback with `ALLOW_RUNTIME_CACHE_STORE_FALLBACK=true`; it is not a database and can evict data.
 
 ## Authentication Setup
 
@@ -183,7 +198,7 @@ The current local MVP uses `.data/subscope-db.json` and `.data/uploads` as a dur
 2. Run the Supabase schema so `users.password_hash` exists.
 3. Users sign up or log in at `/auth/signup` and `/auth/login`.
 4. Logged-out users are redirected to login before dashboard, project, upload, or report routes.
-5. Use `Continue in Demo Mode` on the auth pages for temporary QA access while the product flow is being stabilized.
+5. Use `ENABLE_DEMO_ACCESS=true` only when temporary QA demo access should appear on auth pages. Demo access is hidden by default in production.
 
 ## Deploy To Vercel
 
@@ -198,10 +213,10 @@ For Playwright PDF generation on serverless, keep the `playwright` dependency in
 
 ## Known Limitations
 
-- Local fallback storage or Vercel Runtime Cache is used unless Supabase persistence is configured with the included schema.
+- Local fallback storage is for development only. Production should use Supabase persistence with the included schema.
 - Uploaded binary files are stored locally in dev; production should use Supabase Storage private buckets.
 - PDF/DOCX/XLSX/OCR extraction is scaffolded but not fully implemented.
-- Trade-specific modules currently cover electrical and windows. Other trades route through the general review until their modules are added.
+- Trade-specific modules are lightweight issue-spotting modules. They now cover electrical, plumbing, HVAC, roofing, windows, doors/hardware, flooring, cabinets/countertops, drywall/paint, abatement, appliances, sitework, fire protection, and occupied rehab, but deeper document parsing and AI comparison are still future work.
 - The analysis engine is deterministic and validates structured JSON; an LLM provider can replace or augment it later.
 - Local AHJ requirements are phrased as verification prompts, not verified legal claims.
 - Access control is enforced by signed sessions and ownership checks in local mode; Supabase RLS policies are provided for production.

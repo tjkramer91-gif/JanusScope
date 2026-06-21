@@ -5,6 +5,7 @@ import { RecommendedRevisions } from "@/components/RecommendedRevisions";
 import { RiskSummary } from "@/components/RiskSummary";
 import { createDemoProject } from "@/lib/demo-project";
 import { generateRiskReview } from "@/lib/risk-engine";
+import { SYNTHETIC_REPORT_FOOTER } from "@/lib/synthetic-data";
 
 export default function SampleReportPage() {
   const project = createDemoProject();
@@ -27,6 +28,9 @@ export default function SampleReportPage() {
         <ContractComparisonTable comparisons={review.comparisons} />
         <HiddenScopeTable flags={review.hiddenScopeFlags} />
         <RecommendedRevisions revisions={review.recommendedRevisions} />
+        <section className="card p-6">
+          <p className="text-sm leading-6 text-moss">{SYNTHETIC_REPORT_FOOTER}</p>
+        </section>
       </div>
     </main>
   );

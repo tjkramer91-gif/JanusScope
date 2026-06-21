@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FAKE_SAMPLE_DATA_TRUST_NOTE } from "@/lib/content-safety";
+import { SYNTHETIC_DATA_GOVERNANCE_PROMISES } from "@/lib/synthetic-data";
 
 const TRUST_ITEMS = [
   "What users can upload",
@@ -9,7 +10,7 @@ const TRUST_ITEMS = [
   "How users can delete projects",
   "Whether uploaded documents are used for training",
   "Retention basics",
-  "Fictional sample data policy",
+  "Synthetic sample data policy",
   "Sensitive information warning",
   "Share-Safe Mode explanation",
 ];
@@ -40,13 +41,21 @@ export default function SecurityPage() {
         </div>
       </header>
       <section className="mx-auto max-w-[1080px] px-5 py-20 lg:py-24">
-        <p className="eyebrow">Trust / Data Handling</p>
+        <p className="eyebrow">Data Governance & Privacy</p>
         <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-tight tracking-normal text-ink">
-          Built for sensitive construction documents, with plain-language trust guidance.
+          Data Governance & Privacy for synthetic demos and sensitive project reviews.
         </h1>
         <p className="mt-5 max-w-3xl text-sm leading-6 text-moss">
           {FAKE_SAMPLE_DATA_TRUST_NOTE} JanusScope is a second set of eyes for construction risk, not a substitute for legal counsel, licensed design professionals, code officials, or professional judgment.
         </p>
+
+        <div className="mt-10 grid gap-4">
+          {SYNTHETIC_DATA_GOVERNANCE_PROMISES.map((point) => (
+            <div className="rounded-[24px] border border-line/60 bg-white p-5 text-sm font-semibold leading-6 text-ink shadow-sm" key={point}>
+              {point}
+            </div>
+          ))}
+        </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {TRUST_ITEMS.map((point) => (

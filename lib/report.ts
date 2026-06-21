@@ -1,5 +1,6 @@
 import { RISK_CATEGORY_LABELS } from "@/lib/catalogs";
 import { formatCurrency, severityLabel } from "@/lib/format";
+import { SYNTHETIC_REPORT_FOOTER, isSyntheticDemoProject } from "@/lib/synthetic-data";
 import { IssueLogItem, Project, RiskReview } from "@/lib/types";
 
 function escapeHtml(value: string): string {
@@ -16,8 +17,11 @@ function csvCell(value: string | number | null): string {
 }
 
 export function buildTextReport(project: Project, review: RiskReview): string {
+  const footerLines = isSyntheticDemoProject(project)
+    ? [SYNTHETIC_REPORT_FOOTER, "JanusScope is a construction risk review assistant, not legal advice."]
+    : ["JanusScope is a construction risk review assistant, not legal advice."];
   const lines = [
-    "SUBSCOPE RISK OUTPUT",
+    "JANUSSCOPE RISK REPORT",
     "",
     `Project: ${project.name || "Unnamed project"}`,
     `Address: ${project.projectAddress || "Not provided"}`,
@@ -30,12 +34,53 @@ export function buildTextReport(project: Project, review: RiskReview): string {
     `Overall risk: ${review.riskLevel} (${review.score}/100)`,
     `Final signing recommendation: ${review.finalRecommendation}`,
     "",
+    "EXECUTIVE SUMMARY",
+    `Risk score: ${review.score}/100 (${review.riskLevel})`,
+    `Recommendation: ${review.finalRecommendation}`,
+    "",
+    "TOP 10 RISKS",
+    ...review.issueLog.slice(0, 10).flatMap((issue, index) => [
+      `${index + 1}. [${severityLabel(issue.riskLevel)}] ${issue.issueTitle}`,
+      `   Why it matters: ${issue.whyItMatters}`,
+      `   Recommended action: ${issue.recommendedClarification}`,
+    ]),
+    "",
+    "SCOPE GAPS",
+    ...review.hiddenScopeFlags.flatMap((flag, index) => [
+      `${index + 1}. [${severityLabel(flag.severity)}] ${flag.obligation}`,
+      `   Cost exposure: ${flag.potentialCostImpact}`,
+      `   Clarify: ${flag.questionToAsk}`,
+    ]),
+    "",
+    "CONTRACT CONFLICTS",
+    ...review.comparisons.flatMap((item, index) => [
+      `${index + 1}. [${severityLabel(item.riskLevel)}] ${item.item}`,
+      `   Bid position: ${item.bidPosition}`,
+      `   Contract position: ${item.contractPosition}`,
+      `   Recommended clarification: ${item.recommendedClarification}`,
+    ]),
+    "",
+    "COST EXPOSURE AREAS",
+    ...review.issueLog.slice(0, 10).map((issue, index) => `${index + 1}. ${issue.potentialCostImpact}`),
+    "",
+    "SCHEDULE EXPOSURE AREAS",
+    ...review.scheduleTerms.map((item, index) => `${index + 1}. [${severityLabel(item.risk)}] ${item.label}: ${item.value}`),
+    "",
+    "CLARIFICATION QUESTIONS",
+    ...review.questions.map((question, index) => `${index + 1}. ${question.group}: ${question.question}`),
+    "",
+    "MISSING DOCUMENTS",
+    ...review.missingDocuments.map((document, index) => `${index + 1}. ${document.document}: ${document.reason}`),
+    "",
+    "RECOMMENDED NEXT ACTIONS",
+    ...review.issueLog.slice(0, 8).map((issue, index) => `${index + 1}. ${issue.recommendedClarification}`),
+    "",
     "CATEGORY RATINGS",
     ...Object.entries(review.categoryRatings).map(
       ([category, rating]) => `${RISK_CATEGORY_LABELS[category as keyof typeof RISK_CATEGORY_LABELS]}: ${severityLabel(rating)}`,
     ),
     "",
-    "CONTRACT VS BID COMPARISON",
+    "DETAILED CONTRACT VS BID COMPARISON",
     ...review.comparisons.flatMap((item, index) => [
       `${index + 1}. [${severityLabel(item.riskLevel)}] ${item.item}`,
       `   Bid position: ${item.bidPosition}`,
@@ -44,7 +89,7 @@ export function buildTextReport(project: Project, review: RiskReview): string {
       `   Recommended clarification: ${item.recommendedClarification}`,
     ]),
     "",
-    "HIDDEN SCOPE FLAGS",
+    "DETAILED HIDDEN SCOPE FLAGS",
     ...review.hiddenScopeFlags.flatMap((flag, index) => [
       `${index + 1}. [${severityLabel(flag.severity)}] ${flag.obligation}`,
       `   Language: ${flag.contractLanguage}`,
@@ -61,25 +106,19 @@ export function buildTextReport(project: Project, review: RiskReview): string {
       `   Next action: ${flag.suggestedAction}`,
     ]),
     "",
-    "MISSING DOCUMENTS",
-    ...review.missingDocuments.map((document, index) => `${index + 1}. ${document.document}: ${document.reason}`),
-    "",
-    "QUESTIONS TO ASK BEFORE SIGNING",
-    ...review.questions.map((question, index) => `${index + 1}. ${question.group}: ${question.question}`),
-    "",
     "RECOMMENDED CONTRACT REVISIONS",
     ...review.recommendedRevisions.map((revision, index) => `${index + 1}. ${revision}`),
     "",
     "ASSUMPTIONS",
     ...review.assumptions.map((assumption, index) => `${index + 1}. ${assumption.statement} (${assumption.basis})`),
     "",
-    "JanusScope is a construction risk review assistant, not legal advice.",
+    ...footerLines,
   ];
 
   return lines.join("\n");
 }
 
-export function buildIssueLogCsv(issues: IssueLogItem[]): string {
+export function buildIssueLogCsv(issues: IssueLogItem[], options?: { syntheticDemo?: boolean }): string {
   const headers = [
     "Issue ID",
     "Category",
@@ -111,10 +150,15 @@ export function buildIssueLogCsv(issues: IssueLogItem[]): string {
     issue.dateResolved,
   ]);
 
-  return [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+  const footerRow = options?.syntheticDemo
+    ? [["Notice", "", "", "", "", "", SYNTHETIC_REPORT_FOOTER, "", "", "", "", "", ""]]
+    : [];
+
+  return [headers, ...rows, ...footerRow].map((row) => row.map(csvCell).join(",")).join("\n");
 }
 
 export function buildHtmlReport(project: Project, review: RiskReview): string {
+  const syntheticDemo = isSyntheticDemoProject(project);
   const renderList = (items: string[]) => items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   const renderRows = review.issueLog
     .map(
@@ -134,7 +178,7 @@ export function buildHtmlReport(project: Project, review: RiskReview): string {
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>${escapeHtml(project.name || "JanusScope Risk Output")}</title>
+  <title>${escapeHtml(project.name || "JanusScope Risk Report")}</title>
   <style>
     body { font-family: Arial, sans-serif; color: #1f2328; margin: 32px; line-height: 1.45; }
     @page { margin: 0.65in; @bottom-center { content: "Page " counter(page) " of " counter(pages); } }
@@ -154,13 +198,13 @@ export function buildHtmlReport(project: Project, review: RiskReview): string {
 <body>
   <section class="cover">
     <p>Generated ${escapeHtml(new Date(review.generatedAt).toLocaleDateString("en-US"))}</p>
-    <h1>JanusScope Risk Output</h1>
+    <h1>JanusScope Risk Report</h1>
     <p>${escapeHtml(project.name || "Unnamed project")}</p>
     <p class="risk">${review.score}/100</p>
     <p><strong>${escapeHtml(review.riskLevel)}</strong></p>
     <p>${escapeHtml(review.finalRecommendation)}</p>
   </section>
-  <h1>JanusScope Risk Output</h1>
+  <h1>JanusScope Risk Report</h1>
   <div class="meta">
     <div><strong>Project:</strong> ${escapeHtml(project.name || "Unnamed project")}</div>
     <div><strong>Address:</strong> ${escapeHtml(project.projectAddress || "Not provided")}</div>
@@ -174,12 +218,16 @@ export function buildHtmlReport(project: Project, review: RiskReview): string {
     <p><strong>Risk score:</strong> ${review.score}/100 (${escapeHtml(review.riskLevel)})</p>
     <p><strong>Final signing recommendation:</strong> ${escapeHtml(review.finalRecommendation)}</p>
   </div>
-  <h2>Biggest Issues Before Signing</h2>
-  <ol>${renderList(review.flags.slice(0, 8).map((flag) => `${severityLabel(flag.severity)}: ${flag.issue} - ${flag.suggestedAction}`))}</ol>
-  <h2>Contract vs Bid Comparison</h2>
-  <ol>${renderList(review.comparisons.map((item) => `${item.item}: ${item.conflict} Recommended: ${item.recommendedClarification}`))}</ol>
-  <h2>Hidden Scope Flags</h2>
+  <h2>Top 10 Risks</h2>
+  <ol>${renderList(review.issueLog.slice(0, 10).map((issue) => `${severityLabel(issue.riskLevel)}: ${issue.issueTitle} - ${issue.recommendedClarification}`))}</ol>
+  <h2>Scope Gaps</h2>
   <ol>${renderList(review.hiddenScopeFlags.map((flag) => `${flag.obligation}: ${flag.questionToAsk}`))}</ol>
+  <h2>Contract Conflicts</h2>
+  <ol>${renderList(review.comparisons.map((item) => `${item.item}: ${item.conflict} Recommended: ${item.recommendedClarification}`))}</ol>
+  <h2>Cost Exposure Areas</h2>
+  <ol>${renderList(review.issueLog.slice(0, 10).map((issue) => issue.potentialCostImpact))}</ol>
+  <h2>Schedule Exposure Areas</h2>
+  <ol>${renderList(review.scheduleTerms.map((item) => `${item.label}: ${item.value}`))}</ol>
   <h2>Payment Risk</h2>
   <ol>${renderList(review.paymentTerms.map((item) => `${item.label}: ${item.value}`))}</ol>
   <h2>Change Order Risk</h2>
@@ -199,6 +247,7 @@ export function buildHtmlReport(project: Project, review: RiskReview): string {
     <thead><tr><th>ID</th><th>Category</th><th>Risk</th><th>Description</th><th>Recommended clarification</th></tr></thead>
     <tbody>${renderRows}</tbody>
   </table>
+  ${syntheticDemo ? `<p><small>${escapeHtml(SYNTHETIC_REPORT_FOOTER)}</small></p>` : ""}
   <p><small>JanusScope is a construction risk review assistant, not legal advice.</small></p>
 </body>
 </html>`;

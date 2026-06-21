@@ -81,8 +81,19 @@ function shouldUseSupabase(): boolean {
   return hasSupabaseConfig();
 }
 
+function allowRuntimeCacheFallback(): boolean {
+  return process.env.ALLOW_RUNTIME_CACHE_STORE_FALLBACK === "true";
+}
+
 function shouldUseRuntimeCache(): boolean {
-  return Boolean(process.env.VERCEL) && !shouldUseSupabase();
+  return Boolean(process.env.VERCEL) && !shouldUseSupabase() && allowRuntimeCacheFallback();
+}
+
+function assertProductionStoreConfigured(operation: string): void {
+  if (process.env.NODE_ENV === "production" && process.env.VERCEL && !shouldUseSupabase() && !allowRuntimeCacheFallback()) {
+    logEvent("error", "storage.production_missing", { operation });
+    throw new Error("Production storage is not configured. Add Supabase environment variables before using JanusScope in production.");
+  }
 }
 
 function emptyDb(): Database {
@@ -95,6 +106,7 @@ async function ensureDataDir(): Promise<void> {
 }
 
 async function readDb(): Promise<Database> {
+  assertProductionStoreConfigured("db.read");
   if (shouldUseRuntimeCache()) {
     try {
       const cached = await getCache({ namespace: "subscope-store" }).get(RUNTIME_CACHE_DB_KEY);
@@ -114,6 +126,7 @@ async function readDb(): Promise<Database> {
 }
 
 async function writeDb(db: Database): Promise<void> {
+  assertProductionStoreConfigured("db.write");
   if (shouldUseRuntimeCache()) {
     try {
       await getCache({ namespace: "subscope-store" }).set(RUNTIME_CACHE_DB_KEY, db, {
@@ -179,7 +192,16 @@ function dateOrNull(value: string): string | null {
 }
 
 function storageBucket(): string | null {
-  return process.env.SUPABASE_UPLOAD_BUCKET || process.env.NEXT_PUBLIC_SUPABASE_UPLOAD_BUCKET || null;
+  return process.env.SUPABASE_UPLOAD_BUCKET || null;
+}
+
+function requireStorageBucket(): string {
+  const bucket = storageBucket();
+  if (!bucket) {
+    logEvent("error", "upload.storage_bucket_missing", { storage: "supabase" });
+    throw new Error("Upload storage bucket is not configured. Set SUPABASE_UPLOAD_BUCKET before accepting project files.");
+  }
+  return bucket;
 }
 
 function uploadedFilesFromRows(rows: DbRow[]): UploadedFile[] {
@@ -630,18 +652,14 @@ export async function saveUploadedFile(
 
   if (shouldUseSupabase()) {
     const client = getSupabaseAdmin();
-    const bucket = storageBucket();
-    if (bucket) {
-      const { error: storageError } = await client.storage
-        .from(bucket)
-        .upload(storagePath, Buffer.from(await file.arrayBuffer()), {
-          contentType: file.type || "application/octet-stream",
-          upsert: false,
-        });
-      if (storageError) throw storageError;
-    } else {
-      logEvent("warn", "upload.storage_bucket_missing", { projectId: project.id, storage: "supabase" });
-    }
+    const bucket = requireStorageBucket();
+    const { error: storageError } = await client.storage
+      .from(bucket)
+      .upload(storagePath, Buffer.from(await file.arrayBuffer()), {
+        contentType: file.type || "application/octet-stream",
+        upsert: false,
+      });
+    if (storageError) throw storageError;
 
     const { data, error } = await client
       .from("documents")
@@ -652,7 +670,7 @@ export async function saveUploadedFile(
         file_name: file.name,
         file_type: file.type || "application/octet-stream",
         document_type: documentId,
-        storage_path: bucket ? storagePath : `metadata-only/${storagePath}`,
+        storage_path: storagePath,
         file_size: file.size,
         processing_status: processingStatus,
         extracted_text: extracted.extractedText || null,
@@ -742,6 +760,37 @@ export async function deleteUploadedFile(user: SessionUser, projectId: string, f
   if (file) {
     await fs.rm(path.join(UPLOAD_DIR, file.storagePath), { force: true });
   }
+}
+
+export async function purgeProjectUploadedBinaries(user: SessionUser, projectId: string): Promise<void> {
+  const project = await getProject(user, projectId);
+  if (!project || project.uploadedFiles.length === 0) return;
+
+  if (shouldUseSupabase()) {
+    const bucket = storageBucket();
+    if (!bucket) {
+      logEvent("warn", "upload.binary_purge_skipped", { projectId, storage: "supabase" });
+      return;
+    }
+
+    const paths = project.uploadedFiles
+      .map((file) => file.storagePath)
+      .filter((storagePath) => storagePath && !storagePath.startsWith("metadata-only/"));
+    if (paths.length > 0) {
+      await getSupabaseAdmin().storage.from(bucket).remove(paths);
+    }
+    await addAudit(user, projectId, "file.binaries.purged", { count: paths.length });
+    logEvent("info", "upload.binary_purge.completed", { projectId, count: paths.length, storage: "supabase" });
+    return;
+  }
+
+  await Promise.all(
+    project.uploadedFiles.map((file) =>
+      fs.rm(path.join(UPLOAD_DIR, file.storagePath), { force: true }),
+    ),
+  );
+  await addAudit(user, projectId, "file.binaries.purged", { count: project.uploadedFiles.length });
+  logEvent("info", "upload.binary_purge.completed", { projectId, count: project.uploadedFiles.length, storage: "local" });
 }
 
 export async function deleteProject(user: SessionUser, projectId: string): Promise<void> {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildIssueLogCsv } from "@/lib/report";
 import { generateRiskReview } from "@/lib/risk-engine";
+import { isSyntheticDemoProject } from "@/lib/synthetic-data";
 import { requireUser } from "@/lib/server/auth";
 import { addAudit, getProject } from "@/lib/server/store";
 
@@ -13,7 +14,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   const review = generateRiskReview(project);
   await addAudit(user, project.id, "csv.downloaded", {});
 
-  return new NextResponse(buildIssueLogCsv(review.issueLog), {
+  return new NextResponse(buildIssueLogCsv(review.issueLog, { syntheticDemo: isSyntheticDemoProject(project) }), {
     headers: {
       "content-type": "text/csv;charset=utf-8",
       "content-disposition": `attachment; filename="${project.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-issue-log.csv"`,

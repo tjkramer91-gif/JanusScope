@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { OutputPanel } from "@/components/OutputPanel";
 import type { WorkflowDefinition } from "@/lib/platform-content";
@@ -7,7 +8,6 @@ import type { WorkflowDefinition } from "@/lib/platform-content";
 function buildWorkflowOutput(
   workflow: WorkflowDefinition,
   values: Record<string, string>,
-  fileNames: string[],
   roleMode: string,
   audience: string,
   projectPhase: string,
@@ -31,7 +31,6 @@ function buildWorkflowOutput(
     "",
     "3. Known Information Provided",
     ...(filledInputs.length > 0 ? filledInputs : ["- No project facts were entered yet. Add contract, scope, budget, field, or communication details before using this output externally."]),
-    ...(fileNames.length > 0 ? ["", "Files referenced in this draft:", ...fileNames.map((name) => `- ${name}`)] : []),
     "",
     "4. Missing Information",
     ...(missingInputs.length > 0 ? missingInputs.slice(0, 10).map((label) => `- ${label}`) : ["- No obvious missing input from this workflow form. Still verify source documents."]),
@@ -61,7 +60,6 @@ export function WorkflowInputForm({ workflow }: { workflow: WorkflowDefinition }
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(workflow.inputLabels.map((label) => [label, ""])),
   );
-  const [fileNames, setFileNames] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [hasOutput, setHasOutput] = useState(false);
   const [roleMode, setRoleMode] = useState(workflow.bestFor[0] ?? "");
@@ -69,8 +67,8 @@ export function WorkflowInputForm({ workflow }: { workflow: WorkflowDefinition }
   const [projectPhase, setProjectPhase] = useState(workflow.projectPhases[0] ?? "");
 
   const output = useMemo(
-    () => buildWorkflowOutput(workflow, values, fileNames, roleMode, audience, projectPhase),
-    [audience, fileNames, projectPhase, roleMode, values, workflow],
+    () => buildWorkflowOutput(workflow, values, roleMode, audience, projectPhase),
+    [audience, projectPhase, roleMode, values, workflow],
   );
 
   function runWorkflow(event: FormEvent<HTMLFormElement>) {
@@ -84,7 +82,6 @@ export function WorkflowInputForm({ workflow }: { workflow: WorkflowDefinition }
 
   function clearForm() {
     setValues(Object.fromEntries(workflow.inputLabels.map((label) => [label, ""])));
-    setFileNames([]);
     setHasOutput(false);
     setRoleMode(workflow.bestFor[0] ?? "");
     setAudience(workflow.audiences[0] ?? "");
@@ -161,33 +158,16 @@ export function WorkflowInputForm({ workflow }: { workflow: WorkflowDefinition }
         <section className="card p-8 sm:p-10">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="eyebrow">Optional files</p>
-              <h2 className="mt-2 text-2xl font-semibold text-ink">Attach reference files to this draft</h2>
+              <p className="eyebrow">Document-backed review</p>
+              <h2 className="mt-2 text-2xl font-semibold text-ink">Use project upload for files</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-moss">
-                This workflow draft tracks file names only. To save documents against a project, use the project upload flow.
+                Workflow pages are for fast pasted-context drafts. For drag-and-drop files, auto-classification, source-backed comparison, and saved reports, start from a project.
               </p>
             </div>
-            <label className="button-secondary cursor-pointer" htmlFor="workflow-files">
-              Choose Files
-            </label>
+            <Link className="button-secondary" href="/app/projects/new">
+              Start Project Review
+            </Link>
           </div>
-          <input
-            id="workflow-files"
-            className="sr-only"
-            type="file"
-            multiple
-            accept=".pdf,.docx,.xlsx,.csv,.png,.jpg,.jpeg"
-            onChange={(event) => setFileNames(event.currentTarget.files ? Array.from(event.currentTarget.files).map((file) => file.name) : [])}
-          />
-          {fileNames.length > 0 ? (
-            <ul className="mt-5 grid gap-2 text-sm text-moss sm:grid-cols-2">
-              {fileNames.map((name) => (
-                <li className="truncate rounded-full border border-line/60 bg-paper px-4 py-2" key={name}>
-                  {name}
-                </li>
-              ))}
-            </ul>
-          ) : null}
         </section>
 
         <div className="flex flex-wrap justify-end gap-3">

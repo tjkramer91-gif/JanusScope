@@ -18,7 +18,7 @@ function file(overrides: Partial<UploadedFile>): UploadedFile {
 
 describe("classifyUploadedFile", () => {
   it("labels strong filename matches as classified", () => {
-    const classification = classifyUploadedFile(file({ name: "BDG Electric Proposal.pdf", documentId: "bid-proposal" }));
+    const classification = classifyUploadedFile(file({ name: "trade-bid-proposal.pdf", documentId: "bid-proposal" }));
 
     expect(classification.label).toBe("Subcontractor proposal/bid");
     expect(classification.confidence).toBe("High");

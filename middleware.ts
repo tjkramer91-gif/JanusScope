@@ -6,6 +6,8 @@ function nextWithSessionHeaders(request: NextRequest): NextResponse {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.delete("x-subscope-session");
   requestHeaders.delete("x-subscope-session-verified");
+  requestHeaders.delete("x-subscope-request-path");
+  requestHeaders.set("x-subscope-request-path", `${request.nextUrl.pathname}${request.nextUrl.search}`);
 
   const sessionCookie = request.cookies.get("subscope_session")?.value;
   if (sessionCookie) {
@@ -35,7 +37,6 @@ export function middleware(request: NextRequest) {
   if (!request.cookies.get("subscope_session")) {
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("returnTo", `${request.nextUrl.pathname}${request.nextUrl.search}`);
-    console.warn("[subscope]", { event: "route.protected.redirect", path });
     return NextResponse.redirect(loginUrl);
   }
 

@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import { createEmptyProject } from "@/lib/catalogs";
 import { createDemoProject } from "@/lib/demo-project";
 import { generateRiskReview } from "@/lib/risk-engine";
+import { createSyntheticDemoProfile } from "@/lib/synthetic-data";
 
 const REVIEW_DATE = new Date("2026-06-13T12:00:00-07:00");
+const CLEAN_SCOPE_PROFILE = createSyntheticDemoProfile("clean-limited-scope");
 
 describe("generateRiskReview", () => {
   it("rates the demo subcontract review as severe with direct bid conflicts", () => {
@@ -22,9 +24,9 @@ describe("generateRiskReview", () => {
   it("keeps a complete narrow subcontract review low risk", () => {
     const project = createEmptyProject();
     project.name = "Clean Limited Scope";
-    project.projectAddress = "123 Example Avenue, Example City, ST 00000";
+    project.projectAddress = `${CLEAN_SCOPE_PROFILE.projectAddress}, ${CLEAN_SCOPE_PROFILE.city}, ${CLEAN_SCOPE_PROFILE.state} ${CLEAN_SCOPE_PROFILE.zip}`;
     project.tradeType = "Painting";
-    project.gcName = "Example GC";
+    project.gcName = CLEAN_SCOPE_PROFILE.gcName;
     project.contractAmount = 85000;
     project.documents = project.documents.map((document) => ({ ...document, available: true }));
     project.subcontractText =

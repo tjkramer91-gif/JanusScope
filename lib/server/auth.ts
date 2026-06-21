@@ -19,7 +19,12 @@ interface SessionPayload {
 }
 
 function sessionSecret(): string {
-  return process.env.SESSION_SECRET || process.env.AUTH0_SECRET || "local-dev-subscope-secret-change-me";
+  const secret = process.env.SESSION_SECRET || process.env.AUTH0_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET or AUTH0_SECRET must be configured in production.");
+  }
+  return "local-dev-subscope-secret-change-me";
 }
 
 function sign(value: string): string {
@@ -57,8 +62,11 @@ export async function getSession(): Promise<SessionUser | null> {
 export async function requireUser(): Promise<SessionUser> {
   const user = await getSession();
   if (!user) {
+    const headerStore = await headers();
+    const requestedPath = headerStore.get("x-subscope-request-path") ?? "/app/dashboard";
+    const returnTo = requestedPath.startsWith("/app") ? requestedPath : "/app/dashboard";
     logEvent("warn", "auth.required.redirect", { destination: "/auth/login" });
-    redirect("/auth/login?returnTo=/app/dashboard");
+    redirect(`/auth/login?returnTo=${encodeURIComponent(returnTo)}`);
   }
   return user;
 }
@@ -93,6 +101,10 @@ export function hasAuth0Config(): boolean {
       process.env.AUTH0_CLIENT_ID &&
       process.env.AUTH0_CLIENT_SECRET,
   );
+}
+
+export function isDemoAccessEnabled(): boolean {
+  return process.env.ENABLE_DEMO_ACCESS === "true" || process.env.NODE_ENV !== "production";
 }
 
 export async function createLoginState(returnTo: string, mfa: boolean): Promise<string> {

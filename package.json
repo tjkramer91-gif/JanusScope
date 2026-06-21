@@ -4,14 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run check-sensitive-content",
+    "prebuild": "npm run check-sensitive-content && npm run check-runtime-sensitive-data",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --pool=forks --maxWorkers=1",
     "test:watch": "vitest --pool=forks --maxWorkers=1",
-    "check-sensitive-content": "node scripts/check-sensitive-content.mjs"
+    "check-sensitive-content": "node scripts/check-sensitive-content.mjs",
+    "check-runtime-sensitive-data": "node scripts/check-runtime-sensitive-data.mjs",
+    "privacy:audit": "npm run check-sensitive-content && npm run check-runtime-sensitive-data"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

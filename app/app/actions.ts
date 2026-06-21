@@ -18,6 +18,7 @@ import {
   deleteUploadedFile,
   getProject,
   listIntelligenceGraphs,
+  purgeProjectUploadedBinaries,
   saveIntakeAnswers,
   saveProject,
   saveReview,
@@ -30,7 +31,7 @@ import {
   sourceVerificationSampleTextFields,
 } from "@/lib/source-verification-sample";
 import { DocumentId, IntakeAnswer, Project } from "@/lib/types";
-import { validateUploadFile } from "@/lib/upload-validation";
+import { MAX_UPLOAD_FILES, validateUploadFile } from "@/lib/upload-validation";
 import { projectInputSchema } from "@/lib/validation";
 
 function asDocumentId(value: FormDataEntryValue | null, fallback: DocumentId = "other"): DocumentId {
@@ -67,6 +68,9 @@ async function generateAndSaveReview(user: SessionUser, project: Project): Promi
   const intelligenceHistory = await listIntelligenceGraphs(user, { excludeProjectId: completedProject.id });
   const intelligenceGraph = buildProjectIntelligenceGraph(completedProject, review, intelligenceHistory);
   await saveReview(user, completedProject, analysisJson, intelligenceGraph);
+  if (completedProject.deleteDocumentsAfterReport) {
+    await purgeProjectUploadedBinaries(user, completedProject.id);
+  }
   return completedProject;
 }
 
@@ -174,6 +178,11 @@ export async function uploadDocumentsAction(projectId: string, formData: FormDat
 
   const batchDocumentType = asDocumentId(formData.get("documentType"));
   const files = formData.getAll("files").filter((value): value is File => value instanceof File && value.size > 0);
+  if (files.length > MAX_UPLOAD_FILES) {
+    const message = `Upload ${MAX_UPLOAD_FILES} files or fewer at one time.`;
+    logEvent("warn", "upload.validation_failed", { userId: user.id, projectId, reason: message });
+    redirect(`/app/projects/${projectId}/upload?error=${encodedMessage(message)}`);
+  }
   const firstInvalidFile = files
     .map((file) => ({ file, message: validateUploadFile(file) }))
     .find((item) => item.message);

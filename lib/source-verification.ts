@@ -1,4 +1,5 @@
 import { documentCategoryFor } from "@/lib/document-extraction";
+import { createSyntheticDemoProfile } from "@/lib/synthetic-data";
 import type { Project, UploadedFile, VerificationDocumentCategory } from "@/lib/types";
 
 export type EvidenceConfidence = "High" | "Medium" | "Low";
@@ -113,26 +114,28 @@ interface EvidenceMatch {
 }
 
 const UNABLE_TO_VERIFY = "Unable to verify with the documents and sources currently available.";
+const SYNTHETIC_AHJ_PROFILE = createSyntheticDemoProfile("source-verification-sample");
+const SYNTHETIC_AHJ_LABEL = `${SYNTHETIC_AHJ_PROFILE.city} Building Department`;
 
 const EXAMPLE_CITY_EXTERNAL_SOURCES = [
   {
     id: "example-city-building-permit-plan-review",
-    sourceTitle: "Example City Building Permit and Plan Review",
+    sourceTitle: `${SYNTHETIC_AHJ_PROFILE.city} Building Permit and Plan Review`,
     url: "https://example.com/example-city-building-permits",
-    publisher: "Example City Building Department",
+    publisher: SYNTHETIC_AHJ_LABEL,
     factChecked:
-      "Fictional sample source states that permit scope, adopted code basis, and inspection sequencing must be confirmed before work starts.",
-    sourceType: "Fictional AHJ sample source",
+      "Synthetic sample source states that permit scope, adopted code basis, and inspection sequencing must be confirmed before work starts.",
+    sourceType: "Synthetic AHJ sample source",
     confidence: "High" as const,
   },
   {
     id: "example-city-construction-inspections",
-    sourceTitle: "Example City Construction Inspections",
+    sourceTitle: `${SYNTHETIC_AHJ_PROFILE.city} Construction Inspections`,
     url: "https://example.com/example-city-inspections",
-    publisher: "Example City Building Department",
+    publisher: SYNTHETIC_AHJ_LABEL,
     factChecked:
-      "Fictional sample source states that inspections should be requested before concealed work is covered.",
-    sourceType: "Fictional AHJ sample source",
+      "Synthetic sample source states that inspections should be requested before concealed work is covered.",
+    sourceType: "Synthetic AHJ sample source",
     confidence: "High" as const,
   },
 ];
@@ -256,8 +259,10 @@ function hasEvidenceCategory(documents: EvidenceDocument[], category: Verificati
 }
 
 function exampleCitySourceChecks(project: Project, dateAccessed: string): ExternalSourceCheck[] {
-  const isExampleCity = project.city.trim().toLowerCase() === "example city" && project.state.trim().toLowerCase() === "st";
-  if (!isExampleCity) return [];
+  const isSyntheticSourceCity =
+    project.city.trim().toLowerCase() === SYNTHETIC_AHJ_PROFILE.city.trim().toLowerCase() &&
+    project.state.trim().toLowerCase() === SYNTHETIC_AHJ_PROFILE.state.trim().toLowerCase();
+  if (!isSyntheticSourceCity) return [];
   return EXAMPLE_CITY_EXTERNAL_SOURCES.map((source) => ({ ...source, dateAccessed }));
 }
 
@@ -522,11 +527,11 @@ function addAhjFinding(findings: SourceBackedFinding[], externalSources: Externa
 
   findings.push({
     id: "example-city-permit-code-source",
-    title: "Example City permit and code basis needs project-specific confirmation",
+    title: `${SYNTHETIC_AHJ_PROFILE.city} permit and code basis needs project-specific confirmation`,
     category: "AHJ / permitting",
     risk: "Medium",
     confidence: "High",
-    confidenceReason: "The finding uses a fictional sample AHJ source package, not a real project or real jurisdiction claim.",
+    confidenceReason: "The finding uses a synthetic sample AHJ source package, not a real project or real jurisdiction claim.",
     sourceDocument: buildingSource.sourceTitle,
     sourceLocation: buildingSource.url,
     extractedText: buildingSource.factChecked,

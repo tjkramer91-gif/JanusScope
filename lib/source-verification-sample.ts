@@ -1,4 +1,10 @@
 import { documentCategoryFor } from "@/lib/document-extraction";
+import {
+  SYNTHETIC_STORAGE_PREFIX,
+  createSyntheticDemoProfile,
+  syntheticDatasetApprovalNote,
+  syntheticPriceFor,
+} from "@/lib/synthetic-data";
 import type { DocumentId, Project, UploadedFile } from "@/lib/types";
 
 export interface SourceVerificationSampleDocument {
@@ -8,29 +14,41 @@ export interface SourceVerificationSampleDocument {
   content: string;
 }
 
+const SAMPLE_PROFILE = createSyntheticDemoProfile("source-verification-sample");
+export const SOURCE_VERIFICATION_SAMPLE_QUANTITIES = {
+  subpanels: 124,
+  firestopping: 124,
+} as const;
+const SUBPANEL_QUANTITY = SOURCE_VERIFICATION_SAMPLE_QUANTITIES.subpanels;
+const FIRESTOPPING_QUANTITY = SOURCE_VERIFICATION_SAMPLE_QUANTITIES.firestopping;
+const OWNER_BUDGET_SUBPANEL_PRICE = syntheticPriceFor("electrical-panel-replacement", SAMPLE_PROFILE.seed, "owner-budget");
+const SUBCONTRACTOR_BID_SUBPANEL_PRICE = syntheticPriceFor("apartment-subpanel-upgrade", SAMPLE_PROFILE.seed, "sub-bid");
+const FIRESTOPPING_PRICE = syntheticPriceFor("firestopping-penetration", SAMPLE_PROFILE.seed, "firestopping");
+const AHJ_LABEL = `${SAMPLE_PROFILE.city} Building Department`;
+
 export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocument[] = [
   {
-    name: "fictional-owner-budget-electrical.csv",
+    name: "synthetic-owner-budget-electrical.csv",
     type: "text/csv",
     documentId: "other",
     content: [
       "section,item,quantity,unit,unit_price,total,note",
-      "Electrical,Apartment subpanel,124,each,1700,210800,Owner budget allowance for apartment subpanels",
-      "Electrical,Firestopping,124,each,185,22940,Owner scope includes firestopping at electrical penetrations",
+      `Electrical,Apartment subpanel,${SUBPANEL_QUANTITY},each,${OWNER_BUDGET_SUBPANEL_PRICE},${SUBPANEL_QUANTITY * OWNER_BUDGET_SUBPANEL_PRICE},Synthetic owner budget allowance for apartment subpanels`,
+      `Electrical,Firestopping,${FIRESTOPPING_QUANTITY},each,${FIRESTOPPING_PRICE},${FIRESTOPPING_QUANTITY * FIRESTOPPING_PRICE},Synthetic owner scope includes firestopping at electrical penetrations`,
     ].join("\n"),
   },
   {
-    name: "fictional-subcontractor-bid-electrical.csv",
+    name: "synthetic-subcontractor-bid-electrical.csv",
     type: "text/csv",
     documentId: "bid-proposal",
     content: [
       "section,item,quantity,unit,unit_price,total,note",
-      "Electrical,Apartment subpanel,124,each,2650,328600,Includes upgraded panels feeders grounding meter packs; excludes permits and utility coordination",
+      `Electrical,Apartment subpanel,${SUBPANEL_QUANTITY},each,${SUBCONTRACTOR_BID_SUBPANEL_PRICE},${SUBPANEL_QUANTITY * SUBCONTRACTOR_BID_SUBPANEL_PRICE},Includes upgraded panels feeders grounding meter packs; excludes permits and utility coordination`,
       "Electrical,Firestopping,0,allowance,0,0,Excluded by subcontractor bid",
     ].join("\n"),
   },
   {
-    name: "fictional-owner-scope-electrical.csv",
+    name: "synthetic-owner-scope-electrical.csv",
     type: "text/csv",
     documentId: "scope-letter",
     content: [
@@ -39,7 +57,7 @@ export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocum
     ].join("\n"),
   },
   {
-    name: "fictional-contract-language.csv",
+    name: "synthetic-contract-language.csv",
     type: "text/csv",
     documentId: "gc-subcontract",
     content: [
@@ -51,22 +69,22 @@ export const SOURCE_VERIFICATION_SAMPLE_DOCUMENTS: SourceVerificationSampleDocum
     ].join("\n"),
   },
   {
-    name: "example-city-ahj-source.csv",
+    name: "synthetic-ahj-source.csv",
     type: "text/csv",
     documentId: "permit-ahj",
     content: [
       "source,fact",
-      "Example City Building Permit and Plan Review,Fictional sample source states that permit scope adopted code basis and inspection sequencing must be confirmed before work starts.",
-      "Example City Construction Inspections,Fictional sample source states that inspections should be requested before concealed work is covered.",
+      `${AHJ_LABEL} Permit and Plan Review,Synthetic sample source states that permit scope adopted code basis and inspection sequencing must be confirmed before work starts.`,
+      `${AHJ_LABEL} Construction Inspections,Synthetic sample source states that inspections should be requested before concealed work is covered.`,
     ].join("\n"),
   },
   {
-    name: "sample-pricing-reference.csv",
+    name: "synthetic-pricing-reference.csv",
     type: "text/csv",
     documentId: "other",
     content: [
       "source,item,unit_price,note",
-      "Fictional historical buyout reference,Apartment subpanel,2400,Sample reference for reasonableness only; not an external market quote",
+      `Synthetic pricing engine reference,Apartment subpanel,${syntheticPriceFor("apartment-subpanel-upgrade", SAMPLE_PROFILE.seed, "reference")},Synthetic reasonableness reference only; not an external market quote`,
     ].join("\n"),
   },
 ];
@@ -91,17 +109,17 @@ export function sourceVerificationSampleProjectInput(): Omit<
   | "updatedAt"
 > {
   return {
-    name: "Harbor Flats Renovation source-backed sample",
-    projectAddress: "123 Example Avenue",
-    city: "Example City",
-    state: "ST",
-    zip: "00000",
+    name: `${SAMPLE_PROFILE.projectName} source-backed sample`,
+    projectAddress: SAMPLE_PROFILE.projectAddress,
+    city: SAMPLE_PROFILE.city,
+    state: SAMPLE_PROFILE.state,
+    zip: SAMPLE_PROFILE.zip,
     tradeType: "Electrical",
-    gcName: "Example Builders LLC",
-    ownerName: "Sample Housing Partners",
-    contractAmount: 525000,
-    bidDate: "2026-06-01",
-    executionDeadline: "2026-06-30",
+    gcName: SAMPLE_PROFILE.gcName,
+    ownerName: SAMPLE_PROFILE.ownerName,
+    contractAmount: SAMPLE_PROFILE.contractAmount,
+    bidDate: SAMPLE_PROFILE.bidDate,
+    executionDeadline: SAMPLE_PROFILE.executionDeadline,
     hasMasterServiceAgreement: "not-sure",
     publicOrPrivate: "private",
     prevailingWageStatus: "not-sure",
@@ -114,10 +132,10 @@ export function sourceVerificationSampleTextFields(): Pick<Project, "subcontract
     subcontractText:
       "Payment is due only after owner payment. Proposal exclusions are superseded unless expressly preserved in the subcontract.",
     bidText:
-      "Electrical bid includes apartment subpanels at $2,650 each. Bid note excludes permits, utility coordination, and firestopping.",
+      `Electrical bid includes apartment subpanels at $${SUBCONTRACTOR_BID_SUBPANEL_PRICE.toLocaleString("en-US")} each. Bid note excludes permits, utility coordination, and firestopping.`,
     exclusionsText: "Permits, utility coordination, and firestopping are excluded unless added by written change order.",
     notesText:
-      "Sample package intentionally omits drawings and specifications so the report can show Unable to verify items.",
+      `${syntheticDatasetApprovalNote(SAMPLE_PROFILE.seed, "Source-backed sample review")} Sample package intentionally omits drawings and specifications so the report can show Unable to verify items.`,
   };
 }
 
@@ -131,7 +149,7 @@ export function createSampleUploadedFiles(uploadedAt = new Date().toISOString())
       type: document.type,
       documentId: document.documentId,
       documentCategory: documentCategoryFor(document.documentId, document.name),
-      storagePath: `sample/${document.name}`,
+      storagePath: `${SYNTHETIC_STORAGE_PREFIX}/${document.name}`,
       processingStatus: "classified",
       extractionStatus: "extracted",
       extractionMessage: "CSV text extracted and available for source-backed review.",

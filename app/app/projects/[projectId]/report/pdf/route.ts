@@ -23,7 +23,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       printBackground: true,
       displayHeaderFooter: true,
       footerTemplate: `<div style="font-size:9px;color:#6b7280;width:100%;text-align:center;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>`,
-      headerTemplate: `<div style="font-size:9px;color:#6b7280;width:100%;padding-left:36px;">JanusScope Risk Output</div>`,
+      headerTemplate: `<div style="font-size:9px;color:#6b7280;width:100%;padding-left:36px;">JanusScope Risk Report</div>`,
       margin: { top: "0.7in", right: "0.6in", bottom: "0.7in", left: "0.6in" },
     });
     await browser.close();

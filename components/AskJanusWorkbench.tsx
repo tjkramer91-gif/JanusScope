@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { OutputPanel } from "@/components/OutputPanel";
 import { ASK_JANUS_STARTERS, OUTPUT_AUDIENCES, ROLE_MODES } from "@/lib/platform-content";
 
-function buildAskOutput(prompt: string, context: string, files: string[], role: string, audience: string): string {
+function buildAskOutput(prompt: string, context: string, role: string, audience: string): string {
   const hasContext = context.trim().length > 0;
   const hasPrompt = prompt.trim().length > 0;
 
@@ -29,7 +30,6 @@ function buildAskOutput(prompt: string, context: string, files: string[], role: 
     "",
     "3. Facts vs Unknowns",
     hasContext ? "- Facts provided by user are in the pasted context below." : "- No facts have been provided yet.",
-    ...files.map((file) => `- File referenced: ${file}`),
     "- Unknowns should be confirmed before relying on the output.",
     "",
     "4. Useful Next Questions",
@@ -56,12 +56,11 @@ function buildAskOutput(prompt: string, context: string, files: string[], role: 
 export function AskJanusWorkbench({ initialPrompt = "" }: { initialPrompt?: string }) {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [context, setContext] = useState("");
-  const [files, setFiles] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [hasOutput, setHasOutput] = useState(Boolean(initialPrompt));
   const [roleMode, setRoleMode] = useState<string>(ROLE_MODES[0].label);
   const [audience, setAudience] = useState<string>(OUTPUT_AUDIENCES[0]);
-  const output = useMemo(() => buildAskOutput(prompt, context, files, roleMode, audience), [audience, context, files, prompt, roleMode]);
+  const output = useMemo(() => buildAskOutput(prompt, context, roleMode, audience), [audience, context, prompt, roleMode]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -137,32 +136,15 @@ export function AskJanusWorkbench({ initialPrompt = "" }: { initialPrompt?: stri
           </label>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-line/60 bg-paper p-5">
             <div>
-              <p className="font-semibold text-ink">Optional file references</p>
+              <p className="font-semibold text-ink">Need document-backed review?</p>
               <p className="mt-1 text-sm leading-6 text-moss">
-                This Ask Janus MVP tracks selected file names. Use project upload when documents need to be saved.
+                Upload files through a project so JanusScope can classify, store, and compare the actual package.
               </p>
             </div>
-            <label className="button-secondary cursor-pointer" htmlFor="ask-files">
-              Choose Files
-            </label>
-            <input
-              id="ask-files"
-              className="sr-only"
-              type="file"
-              multiple
-              accept=".pdf,.docx,.xlsx,.csv,.png,.jpg,.jpeg"
-              onChange={(event) => setFiles(event.currentTarget.files ? Array.from(event.currentTarget.files).map((file) => file.name) : [])}
-            />
+            <Link className="button-secondary" href="/app/projects/new">
+              Start Project Review
+            </Link>
           </div>
-          {files.length > 0 ? (
-            <ul className="mt-4 flex flex-wrap gap-2 text-sm text-moss">
-              {files.map((file) => (
-                <li className="rounded-full border border-line/60 bg-paper px-4 py-2" key={file}>
-                  {file}
-                </li>
-              ))}
-            </ul>
-          ) : null}
         </section>
 
         <div className="flex justify-end">

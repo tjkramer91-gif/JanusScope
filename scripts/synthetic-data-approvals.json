@@ -1,0 +1,8 @@
+{
+  "approvedFiles": {
+    "lib/synthetic-data.ts": {
+      "approvedBy": "janusscope-platform",
+      "reason": "Central synthetic identities, addresses, contacts, and pricing rules for approved demo content."
+    }
+  }
+}

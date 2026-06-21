@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { safeReturnTo } from "@/lib/return-to";
-import { makeDemoUser, setSession } from "@/lib/server/auth";
+import { isDemoAccessEnabled, makeDemoUser, setSession } from "@/lib/server/auth";
 import { errorMessage, logEvent } from "@/lib/server/logger";
 import { hashPassword, verifyPassword } from "@/lib/server/password";
 import { createPasswordUser, ensureWorkspace, findPasswordUserByEmail } from "@/lib/server/store";
@@ -84,6 +84,10 @@ export async function signupAction(_previousState: AuthFormState, formData: Form
 
 export async function demoAccessAction(formData: FormData): Promise<void> {
   const returnTo = String(formData.get("returnTo") || "/app/dashboard");
+  if (!isDemoAccessEnabled()) {
+    logEvent("warn", "auth.demo.blocked");
+    redirect(`/auth/login?returnTo=${encodeURIComponent(safeReturnTo(returnTo))}`);
+  }
   const user = makeDemoUser();
   await setSession(user);
   await ensureWorkspace(user);

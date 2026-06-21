@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateUploadFile } from "@/lib/upload-validation";
+import { MAX_UPLOAD_FILES, validateUploadFile } from "@/lib/upload-validation";
 
 describe("validateUploadFile", () => {
   it("allows the supported document and image types", () => {
@@ -16,5 +16,9 @@ describe("validateUploadFile", () => {
     expect(validateUploadFile({ name: "notes.txt", size: 1024, type: "text/plain" })).toContain("Upload PDF");
     expect(validateUploadFile({ name: "empty.pdf", size: 0, type: "application/pdf" })).toContain("Choose a file");
     expect(validateUploadFile({ name: "large.pdf", size: 26 * 1024 * 1024, type: "application/pdf" })).toContain("25 MB");
+  });
+
+  it("defines a batch upload limit for server actions", () => {
+    expect(MAX_UPLOAD_FILES).toBe(20);
   });
 });

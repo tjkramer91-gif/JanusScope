@@ -693,8 +693,8 @@ export function generateRiskReview(project: Project, asOf = new Date()): RiskRev
 
   if (project.uploadedFiles.length > 0) {
     addAssumption(
-      "Uploaded files are classified by file name and selected document type in this MVP.",
-      "File contents stay in the browser and are not parsed by a server-side document extraction pipeline.",
+      "Uploaded files are classified and text-like files are parsed for source-backed review in this MVP.",
+      "CSV content is extracted server-side. PDF, DOCX, XLSX, PNG, and JPG files are stored and classified, but deep text extraction for those formats is still pending.",
     );
   }
 

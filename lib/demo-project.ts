@@ -1,8 +1,14 @@
 import { createEmptyProject } from "@/lib/catalogs";
 import { INTAKE_QUESTIONS } from "@/lib/checklist";
+import {
+  SYNTHETIC_STORAGE_PREFIX,
+  createSyntheticDemoProfile,
+  syntheticDatasetApprovalNote,
+} from "@/lib/synthetic-data";
 import { Project } from "@/lib/types";
 
 export function createDemoProject(): Project {
+  const profile = createSyntheticDemoProfile("demo-report");
   const project = createEmptyProject({
     id: "demo-subscope-risk-review",
     organizationId: "demo-org",
@@ -21,17 +27,17 @@ export function createDemoProject(): Project {
 
   return {
     ...project,
-    name: "Harbor Flats Renovation - Demo Review",
-    projectAddress: "123 Example Avenue",
-    city: "Example City",
-    state: "ST",
-    zip: "00000",
+    name: `${profile.projectName} Demo Review`,
+    projectAddress: profile.projectAddress,
+    city: profile.city,
+    state: profile.state,
+    zip: profile.zip,
     tradeType: "Electrical",
-    gcName: "Example Builders LLC",
-    ownerName: "Sample Housing Partners",
-    contractAmount: 485000,
-    bidDate: "2026-05-29",
-    executionDeadline: "2026-06-20",
+    gcName: profile.gcName,
+    ownerName: profile.ownerName,
+    contractAmount: profile.contractAmount,
+    bidDate: profile.bidDate,
+    executionDeadline: profile.executionDeadline,
     hasMasterServiceAgreement: "not-sure",
     publicOrPrivate: "private",
     prevailingWageStatus: "not-sure",
@@ -44,21 +50,21 @@ export function createDemoProject(): Project {
     uploadedFiles: [
       {
         id: "demo-doc-1",
-        name: "Example Builders Subcontract Agreement - Electrical.pdf",
+        name: "synthetic-gc-subcontract-electrical.pdf",
         size: 1_280_000,
         type: "application/pdf",
         documentId: "gc-subcontract",
-        storagePath: "demo/Example-Builders-Subcontract-Agreement-Electrical.pdf",
+        storagePath: `${SYNTHETIC_STORAGE_PREFIX}/synthetic-gc-subcontract-electrical.pdf`,
         processingStatus: "classified",
         uploadedAt: new Date().toISOString(),
       },
       {
         id: "demo-doc-2",
-        name: "Harbor Flats Electrical Proposal 2026-05-29.pdf",
+        name: "synthetic-electrical-proposal.pdf",
         size: 420_000,
         type: "application/pdf",
         documentId: "bid-proposal",
-        storagePath: "demo/Harbor-Flats-Electrical-Proposal.pdf",
+        storagePath: `${SYNTHETIC_STORAGE_PREFIX}/synthetic-electrical-proposal.pdf`,
         processingStatus: "classified",
         uploadedAt: new Date().toISOString(),
       },
@@ -77,7 +83,7 @@ export function createDemoProject(): Project {
     exclusionsText:
       "Exclusions: permits, testing and inspections, engineering and delegated design, patching and repair of existing conditions, temporary facilities, hoisting, dumpsters, scaffolding, lifts, sales tax, freight, storage, escalation, overtime, premium time, weekend work, firestopping, warranty beyond one year, as-builts beyond standard redlines.",
     notesText:
-      "Estimator noted that addendum 3 was not included in the bid and the GC wants the subcontract executed before insurance exhibit review is complete.",
+      `${syntheticDatasetApprovalNote(profile.seed, "Demo report package")} Estimator noted that addendum 3 was not included in the bid and the GC wants the subcontract executed before insurance exhibit review is complete.`,
     updatedAt: new Date().toISOString(),
   };
 }

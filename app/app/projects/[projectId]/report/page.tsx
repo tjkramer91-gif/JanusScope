@@ -16,6 +16,7 @@ import { SourceVerificationReport } from "@/components/SourceVerificationReport"
 import { buildProjectIntelligenceGraph } from "@/lib/intelligence-graph";
 import { buildPrioritizedReport } from "@/lib/prioritized-report";
 import { generateRiskReview } from "@/lib/risk-engine";
+import { SYNTHETIC_REPORT_FOOTER, isSyntheticDemoProject } from "@/lib/synthetic-data";
 import { addAudit, getProject, listIntelligenceGraphs } from "@/lib/server/store";
 import { requireUser } from "@/lib/server/auth";
 import { buildSourceVerification } from "@/lib/source-verification";
@@ -36,6 +37,7 @@ export default async function ReportPage({ params }: { params: Promise<{ project
   const priorityReport = buildPrioritizedReport({ review, sourceVerification, detectedTrade, tradeFindings });
   const intelligenceHistory = await listIntelligenceGraphs(user, { excludeProjectId: project.id });
   const intelligenceGraph = buildProjectIntelligenceGraph(project, review, intelligenceHistory);
+  const syntheticDemo = isSyntheticDemoProject(project);
   await addAudit(user, project.id, "report.viewed", {});
   const deleteReports = deleteReportsAction.bind(null, project.id);
   const deleteProject = deleteProjectAction.bind(null, project.id);
@@ -63,12 +65,12 @@ export default async function ReportPage({ params }: { params: Promise<{ project
           <div>
           <h2 className="section-title">Report actions</h2>
           <p className="mt-1 text-sm leading-6 text-moss">
-              Export and delete controls are part of the product direction. The PDF action is a placeholder-style export for the current web report.
+              Export the current source-backed report or delete generated outputs when the review is no longer needed.
           </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link className="button-primary" href={`/auth/login?mfa=1&returnTo=/app/projects/${project.id}/report/pdf`}>
-              Export to PDF Placeholder
+              Export PDF
             </Link>
             <Link className="button-secondary" href={`/auth/login?mfa=1&returnTo=/app/projects/${project.id}/report/csv`}>
               Download CSV Issue Log
@@ -89,6 +91,12 @@ export default async function ReportPage({ params }: { params: Promise<{ project
 
       <RiskSummary project={project} review={review} />
       <PriorityRiskOutput report={priorityReport} />
+
+      {syntheticDemo ? (
+        <section className="card border border-steel/20 bg-white p-6">
+          <p className="text-sm leading-6 text-moss">{SYNTHETIC_REPORT_FOOTER}</p>
+        </section>
+      ) : null}
 
       <details className="border-t border-line/70 pt-6">
         <summary className="cursor-pointer rounded-[18px] border border-line/60 bg-paper px-5 py-4 text-lg font-semibold text-ink">

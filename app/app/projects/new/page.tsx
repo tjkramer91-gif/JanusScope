@@ -2,9 +2,11 @@ import { MSA_STATUS_LABELS, PROJECT_TYPE_LABELS, PUBLIC_PRIVATE_LABELS, YES_NO_N
 import { createProjectAction } from "@/app/app/actions";
 import { PendingSubmitButton } from "@/components/PendingSubmitButton";
 import { StatusBanner } from "@/components/StatusBanner";
+import { createSyntheticDemoProfile } from "@/lib/synthetic-data";
 
 export default async function NewProjectPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
+  const placeholder = createSyntheticDemoProfile("project-form-placeholder");
 
   return (
     <form action={createProjectAction} className="mx-auto max-w-[1120px] space-y-8">
@@ -33,7 +35,7 @@ export default async function NewProjectPage({ searchParams }: { searchParams: P
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <label className="md:col-span-2">
             <span className="field-label">Project name</span>
-            <input className="field" name="name" required placeholder="Harbor Flats Renovation" />
+            <input className="field" name="name" required placeholder={placeholder.projectName} />
           </label>
           <label>
             <span className="field-label">GC name</span>
@@ -57,19 +59,19 @@ export default async function NewProjectPage({ searchParams }: { searchParams: P
           </label>
           <label className="md:col-span-2">
             <span className="field-label">Project location</span>
-            <input className="field" name="projectAddress" required placeholder="Street address or project site" />
+            <input className="field" name="projectAddress" required placeholder={placeholder.projectAddress} />
           </label>
           <label>
             <span className="field-label">City</span>
-            <input className="field" name="city" required />
+            <input className="field" name="city" required placeholder={placeholder.city} />
           </label>
           <label>
             <span className="field-label">State</span>
-            <input className="field" name="state" required />
+            <input className="field" name="state" required placeholder={placeholder.state} />
           </label>
           <label>
             <span className="field-label">ZIP</span>
-            <input className="field" name="zip" />
+            <input className="field" name="zip" placeholder={placeholder.zip} />
           </label>
           <label>
             <span className="field-label">Owner name</span>

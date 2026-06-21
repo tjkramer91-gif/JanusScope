@@ -4,6 +4,7 @@ import { buildProjectIntelligenceGraph } from "@/lib/intelligence-graph";
 import { generateRiskReview } from "@/lib/risk-engine";
 
 const REVIEW_DATE = new Date("2026-06-13T12:00:00-07:00");
+const slug = (value: string) => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 describe("buildProjectIntelligenceGraph", () => {
   it("turns a risk review into connected memory nodes and links", () => {
@@ -12,7 +13,7 @@ describe("buildProjectIntelligenceGraph", () => {
     const graph = buildProjectIntelligenceGraph(project, review);
 
     expect(graph.projectId).toBe(project.id);
-    expect(graph.nodes.some((node) => node.id === "gc:example-builders-llc")).toBe(true);
+    expect(graph.nodes.some((node) => node.id === `gc:${slug(project.gcName)}`)).toBe(true);
     expect(graph.nodes.some((node) => node.id === "trade:electrical")).toBe(true);
     expect(graph.nodes.some((node) => node.type === "risk-category")).toBe(true);
     expect(graph.edges.some((edge) => edge.type === "flags")).toBe(true);
@@ -27,7 +28,7 @@ describe("buildProjectIntelligenceGraph", () => {
     const secondProject = {
       ...createDemoProject(),
       id: "demo-subscope-risk-review-2",
-      name: "Harbor Flats Renovation - Follow-up Review",
+      name: `${firstProject.name} Follow-up Review`,
     };
     const secondReview = generateRiskReview(secondProject, REVIEW_DATE);
     const secondGraph = buildProjectIntelligenceGraph(secondProject, secondReview, [firstGraph]);

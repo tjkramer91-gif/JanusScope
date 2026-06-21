@@ -15,6 +15,7 @@ export type TradeScopeCategory =
   | "Concrete"
   | "Sitework"
   | "Landscaping"
+  | "Abatement"
   | "Fire protection"
   | "Appliances"
   | "General conditions"
@@ -42,6 +43,7 @@ const TRADE_PATTERNS: Array<{ trade: TradeScopeCategory; terms: RegExp[] }> = [
   { trade: "Concrete", terms: [/concrete|rebar|slab|footing|formwork|post-tension/] },
   { trade: "Sitework", terms: [/sitework|earthwork|grading|utility|storm drain|asphalt|paving/] },
   { trade: "Landscaping", terms: [/landscape|irrigation|planting|tree|mulch|sod/] },
+  { trade: "Abatement", terms: [/abatement|asbestos|lead paint|lead-safe|hazmat|hazardous material|mold remediation/] },
   { trade: "Fire protection", terms: [/fire protection|sprinkler|nfpa|fire pump|standpipe/] },
   { trade: "Appliances", terms: [/appliance|refrigerator|range|dishwasher|washer|dryer/] },
   { trade: "General conditions", terms: [/general conditions|supervision|site logistics|temporary facilities/] },
