@@ -2,9 +2,9 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { OutputPanel } from "@/components/OutputPanel";
-import { ASK_JANUS_STARTERS } from "@/lib/platform-content";
+import { ASK_JANUS_STARTERS, OUTPUT_AUDIENCES, ROLE_MODES } from "@/lib/platform-content";
 
-function buildAskOutput(prompt: string, context: string, files: string[]): string {
+function buildAskOutput(prompt: string, context: string, files: string[], role: string, audience: string): string {
   const hasContext = context.trim().length > 0;
   const hasPrompt = prompt.trim().length > 0;
 
@@ -18,10 +18,12 @@ function buildAskOutput(prompt: string, context: string, files: string[]): strin
     hasContext
       ? "The response should be based on the pasted project information, not outside assumptions."
       : "No project context was pasted yet, so this output is a response framework rather than a project-specific answer.",
+    `Primary role mode: ${role}`,
+    `Output audience: ${audience}`,
     "",
     "2. Highest Risk Items To Check First",
     "- Scope ownership: confirm who is responsible for labor, materials, coordination, temporary protection, permits, testing, and cleanup.",
-    "- Contract conflict: check whether the contract, scope exhibit, bid, drawings, specs, and addenda say different things.",
+    "- Contract conflict: check whether the contract, scope exhibit, bid, drawings, specs, addenda, and owner notes say different things.",
     "- Notice and timing: verify deadlines for RFI, change order, claim notice, pricing, schedule impact, and written authorization.",
     "- Cost exposure: identify work that is vague, excluded, assumed, allowance-based, or missing backup.",
     "",
@@ -57,7 +59,9 @@ export function AskJanusWorkbench({ initialPrompt = "" }: { initialPrompt?: stri
   const [files, setFiles] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [hasOutput, setHasOutput] = useState(Boolean(initialPrompt));
-  const output = useMemo(() => buildAskOutput(prompt, context, files), [context, files, prompt]);
+  const [roleMode, setRoleMode] = useState<string>(ROLE_MODES[0].label);
+  const [audience, setAudience] = useState<string>(OUTPUT_AUDIENCES[0]);
+  const output = useMemo(() => buildAskOutput(prompt, context, files, roleMode, audience), [audience, context, files, prompt, roleMode]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -91,7 +95,29 @@ export function AskJanusWorkbench({ initialPrompt = "" }: { initialPrompt?: stri
 
       <form className="space-y-6" onSubmit={submit}>
         <section className="card p-8 sm:p-10">
-          <label className="block">
+          <div className="grid gap-5 md:grid-cols-2">
+            <label>
+              <span className="field-label">Role mode</span>
+              <select className="field" value={roleMode} onChange={(event) => setRoleMode(event.target.value)}>
+                {ROLE_MODES.map((role) => (
+                  <option key={role.id} value={role.label}>
+                    {role.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="field-label">Output audience</span>
+              <select className="field" value={audience} onChange={(event) => setAudience(event.target.value)}>
+                {OUTPUT_AUDIENCES.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <label className="mt-6 block">
             <span className="field-label">What do you want JanusScope to help with?</span>
             <input
               className="field"
@@ -131,7 +157,9 @@ export function AskJanusWorkbench({ initialPrompt = "" }: { initialPrompt?: stri
           {files.length > 0 ? (
             <ul className="mt-4 flex flex-wrap gap-2 text-sm text-moss">
               {files.map((file) => (
-                <li className="rounded-full border border-line/60 bg-paper px-4 py-2" key={file}>{file}</li>
+                <li className="rounded-full border border-line/60 bg-paper px-4 py-2" key={file}>
+                  {file}
+                </li>
               ))}
             </ul>
           ) : null}

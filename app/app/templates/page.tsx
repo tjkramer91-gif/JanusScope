@@ -8,7 +8,7 @@ export default function TemplatesPage() {
         <p className="eyebrow">Templates</p>
         <h1 className="mt-2 text-3xl font-semibold text-ink">Reusable construction templates</h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-          Copy checklist, matrix, form, tracker, and report structures. Downloadable Word, Excel, and PDF exports can build from these structures later.
+          Copy checklists, matrices, forms, trackers, and report structures for scope review, buyout, housing due diligence, field issues, and requirement verification.
         </p>
       </div>
       <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">

@@ -41,13 +41,28 @@ export default async function WorkflowDetailPage({
           </div>
         </div>
         <div className="card p-6 md:col-span-2">
-          <p className="eyebrow">Output format</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {workflow.outputSections.map((section) => (
-              <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-moss" key={section}>
-                {section}
-              </span>
-            ))}
+          <p className="eyebrow">{workflow.category}</p>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <div>
+              <p className="text-xs font-semibold uppercase text-steel">Project phases</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {workflow.projectPhases.map((section) => (
+                  <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-moss" key={section}>
+                    {section}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase text-steel">Output format</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {workflow.outputSections.map((section) => (
+                  <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-moss" key={section}>
+                    {section}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

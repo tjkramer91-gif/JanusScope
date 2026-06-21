@@ -4,7 +4,14 @@ import { FormEvent, useMemo, useState } from "react";
 import { OutputPanel } from "@/components/OutputPanel";
 import type { WorkflowDefinition } from "@/lib/platform-content";
 
-function buildWorkflowOutput(workflow: WorkflowDefinition, values: Record<string, string>, fileNames: string[]): string {
+function buildWorkflowOutput(
+  workflow: WorkflowDefinition,
+  values: Record<string, string>,
+  fileNames: string[],
+  roleMode: string,
+  audience: string,
+  projectPhase: string,
+): string {
   const filledInputs = Object.entries(values)
     .filter(([, value]) => value.trim().length > 0)
     .map(([label, value]) => `- ${label}: ${value.trim()}`);
@@ -15,27 +22,28 @@ function buildWorkflowOutput(workflow: WorkflowDefinition, values: Record<string
     "",
     "1. Executive Summary",
     `Based on the information provided, this ${workflow.shortTitle.toLowerCase()} should focus first on scope ownership, unclear responsibility, missing backup, and decisions that could create cost or schedule exposure.`,
+    `Primary review role: ${roleMode}`,
+    `Project phase: ${projectPhase}`,
+    `Output audience: ${audience}`,
     "",
     "2. Highest Risk Items",
-    ...workflow.reviewFocus.slice(0, 5).map((item) => `- ${item}: needs verification against the source documents before relying on the output.`),
+    ...workflow.reviewFocus.slice(0, 6).map((item) => `- ${item}: needs verification against the source documents before relying on the output.`),
     "",
     "3. Known Information Provided",
     ...(filledInputs.length > 0 ? filledInputs : ["- No project facts were entered yet. Add contract, scope, budget, field, or communication details before using this output externally."]),
     ...(fileNames.length > 0 ? ["", "Files referenced in this draft:", ...fileNames.map((name) => `- ${name}`)] : []),
     "",
     "4. Missing Information",
-    ...(missingInputs.length > 0 ? missingInputs.slice(0, 8).map((label) => `- ${label}`) : ["- No obvious missing input from this workflow form. Still verify source documents."]),
+    ...(missingInputs.length > 0 ? missingInputs.slice(0, 10).map((label) => `- ${label}`) : ["- No obvious missing input from this workflow form. Still verify source documents."]),
     "",
     "5. Clarification Questions",
     "- Who owns the disputed or unclear scope item?",
-    "- What document controls if the bid, contract, drawings, specs, or addenda conflict?",
+    "- What document controls if the bid, contract, drawings, specs, addenda, budget, or owner report conflict?",
     "- What exclusions, assumptions, allowances, alternates, or qualifications need to be preserved in writing?",
-    "- What deadline applies for notice, pricing, response, or field direction?",
+    "- What deadline applies for notice, pricing, response, field direction, or owner communication?",
     "",
     "6. Recommended Next Actions",
-    "- Confirm source documents and dates before sending this externally.",
-    "- Convert the highest risk items into a clarification log or RFI if an answer is needed.",
-    "- Save the final output under a project when the document package needs a report history.",
+    ...workflow.nextActions.map((action) => `- ${action}`),
     "",
     "7. Draft Deliverable",
     `Subject: ${workflow.shortTitle} clarification`,
@@ -56,8 +64,14 @@ export function WorkflowInputForm({ workflow }: { workflow: WorkflowDefinition }
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [hasOutput, setHasOutput] = useState(false);
+  const [roleMode, setRoleMode] = useState(workflow.bestFor[0] ?? "");
+  const [audience, setAudience] = useState(workflow.audiences[0] ?? "");
+  const [projectPhase, setProjectPhase] = useState(workflow.projectPhases[0] ?? "");
 
-  const output = useMemo(() => buildWorkflowOutput(workflow, values, fileNames), [fileNames, values, workflow]);
+  const output = useMemo(
+    () => buildWorkflowOutput(workflow, values, fileNames, roleMode, audience, projectPhase),
+    [audience, fileNames, projectPhase, roleMode, values, workflow],
+  );
 
   function runWorkflow(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,6 +80,15 @@ export function WorkflowInputForm({ workflow }: { workflow: WorkflowDefinition }
       setHasOutput(true);
       setIsRunning(false);
     }, 450);
+  }
+
+  function clearForm() {
+    setValues(Object.fromEntries(workflow.inputLabels.map((label) => [label, ""])));
+    setFileNames([]);
+    setHasOutput(false);
+    setRoleMode(workflow.bestFor[0] ?? "");
+    setAudience(workflow.audiences[0] ?? "");
+    setProjectPhase(workflow.projectPhases[0] ?? "");
   }
 
   return (
@@ -78,6 +101,38 @@ export function WorkflowInputForm({ workflow }: { workflow: WorkflowDefinition }
             <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
               Use the fields that matter. Leave unknowns blank and JanusScope will flag them as missing information.
             </p>
+          </div>
+          <div className="mb-6 grid gap-5 md:grid-cols-3">
+            <label>
+              <span className="field-label">Role mode</span>
+              <select className="field" value={roleMode} onChange={(event) => setRoleMode(event.target.value)}>
+                {workflow.bestFor.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="field-label">Project phase</span>
+              <select className="field" value={projectPhase} onChange={(event) => setProjectPhase(event.target.value)}>
+                {workflow.projectPhases.map((phase) => (
+                  <option key={phase} value={phase}>
+                    {phase}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="field-label">Output audience</span>
+              <select className="field" value={audience} onChange={(event) => setAudience(event.target.value)}>
+                {workflow.audiences.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="grid gap-5 md:grid-cols-2">
             {workflow.inputLabels.map((label, index) => (
@@ -127,18 +182,16 @@ export function WorkflowInputForm({ workflow }: { workflow: WorkflowDefinition }
           {fileNames.length > 0 ? (
             <ul className="mt-5 grid gap-2 text-sm text-moss sm:grid-cols-2">
               {fileNames.map((name) => (
-                <li className="truncate rounded-full border border-line/60 bg-paper px-4 py-2" key={name}>{name}</li>
+                <li className="truncate rounded-full border border-line/60 bg-paper px-4 py-2" key={name}>
+                  {name}
+                </li>
               ))}
             </ul>
           ) : null}
         </section>
 
         <div className="flex flex-wrap justify-end gap-3">
-          <button className="button-secondary" type="button" onClick={() => {
-            setValues(Object.fromEntries(workflow.inputLabels.map((label) => [label, ""])));
-            setFileNames([]);
-            setHasOutput(false);
-          }}>
+          <button className="button-secondary" type="button" onClick={clearForm}>
             Clear
           </button>
           <button className="button-primary" type="submit" disabled={isRunning}>

@@ -1,11 +1,24 @@
 import Link from "next/link";
-import { SECURITY_CONTROLS } from "@/lib/subscope-content";
+import { FAKE_SAMPLE_DATA_TRUST_NOTE } from "@/lib/content-safety";
+
+const TRUST_ITEMS = [
+  "What users can upload",
+  "User responsibility for authorization",
+  "How files are stored",
+  "How users can delete files",
+  "How users can delete projects",
+  "Whether uploaded documents are used for training",
+  "Retention basics",
+  "Fictional sample data policy",
+  "Sensitive information warning",
+  "Share-Safe Mode explanation",
+];
 
 const DETAILS = [
-  ["Private project documents", "Customer documents belong to the customer workspace and should not be public."],
-  ["Organization-based access", "The current structure scopes projects by user and organization. Role-based permissions can be layered in later."],
-  ["Deletion and retention", "Project deletion, report deletion, and document deletion paths are first-class product controls."],
-  ["Model-use boundary", "No customer data should be used to train outside models unless the customer explicitly allows it."],
+  ["Private project documents", "Construction contracts, budgets, reports, proposals, and internal notes are sensitive. Teams should treat storage, sharing, and retention controls as first-class product concerns."],
+  ["Authorization matters", "Users are responsible for ensuring they have authorization to upload and review the project material they use inside JanusScope."],
+  ["Deletion and retention", "Uploaded files, reports, and projects should remain user-controlled actions. Production retention behavior should be documented clearly before confidential rollout."],
+  ["Model-use boundary", "Customer project material should not be used for training outside models unless the customer explicitly authorizes it."],
 ];
 
 export default function SecurityPage() {
@@ -13,21 +26,30 @@ export default function SecurityPage() {
     <main className="min-h-screen bg-paper">
       <header className="border-b border-line/45 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1080px] items-center justify-between px-5 py-4">
-          <Link href="/" className="font-semibold text-ink">JanusScope</Link>
-          <Link href="/auth/login?returnTo=/app/dashboard" className="button-secondary">Open JanusScope</Link>
+          <Link href="/" className="font-semibold text-ink">
+            JanusScope
+          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/trust" className="button-secondary">
+              Trust Page
+            </Link>
+            <Link href="/auth/login?returnTo=/app/dashboard" className="button-primary">
+              Open JanusScope
+            </Link>
+          </div>
         </div>
       </header>
       <section className="mx-auto max-w-[1080px] px-5 py-20 lg:py-24">
-        <p className="eyebrow">Security and data controls</p>
-        <h1 className="mt-3 max-w-3xl text-4xl font-semibold leading-tight tracking-normal text-ink">
-          Built around private construction documents and clear customer controls.
+        <p className="eyebrow">Trust / Data Handling</p>
+        <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-tight tracking-normal text-ink">
+          Built for sensitive construction documents, with plain-language trust guidance.
         </h1>
         <p className="mt-5 max-w-3xl text-sm leading-6 text-moss">
-          JanusScope is a construction risk and workflow assistant. It is not a lawyer replacement, and security controls should stay visible because contracts, bids, drawings, and pricing are sensitive.
+          {FAKE_SAMPLE_DATA_TRUST_NOTE} JanusScope is a second set of eyes for construction risk, not a substitute for legal counsel, licensed design professionals, code officials, or professional judgment.
         </p>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {SECURITY_CONTROLS.map((point) => (
+          {TRUST_ITEMS.map((point) => (
             <div className="rounded-[24px] border border-line/60 bg-white p-5 text-sm font-semibold leading-6 text-ink shadow-sm" key={point}>
               {point}
             </div>

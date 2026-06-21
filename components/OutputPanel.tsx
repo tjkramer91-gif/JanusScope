@@ -1,6 +1,8 @@
 "use client";
 
 import { CopyButton } from "@/components/CopyButton";
+import { OutputTransformButtons } from "@/components/OutputTransformButtons";
+import { TRANSFORM_ACTIONS } from "@/lib/platform-content";
 
 export function OutputPanel({
   title,
@@ -24,6 +26,9 @@ export function OutputPanel({
             Print / PDF
           </button>
         </div>
+      </div>
+      <div className="border-b border-line/60 p-6 sm:p-8">
+        <OutputTransformButtons actions={TRANSFORM_ACTIONS} />
       </div>
       <pre className="whitespace-pre-wrap p-6 text-sm leading-6 text-ink sm:p-8">{content}</pre>
     </section>

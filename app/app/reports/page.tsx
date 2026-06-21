@@ -19,7 +19,16 @@ export default async function ReportsPage() {
       </div>
 
       <section className="grid gap-4 md:grid-cols-4">
-        {["Contract review report", "Scope gap report", "Budget risk report", "RFI or change narrative"].map((type) => (
+        {[
+          "What Am I Missing report",
+          "Contract review report",
+          "Scope gap report",
+          "Bid leveling report",
+          "Budget risk report",
+          "Requirement Radar report",
+          "Affordable housing review report",
+          "RFI or change narrative",
+        ].map((type) => (
           <div className="card p-5" key={type}>
             <p className="text-sm font-semibold text-ink">{type}</p>
             <p className="mt-2 text-xs leading-5 text-moss">Structured export support</p>
