@@ -6,7 +6,6 @@ export default function NewProjectError({ error, reset }: { error: Error & { dig
   useEffect(() => {
     console.error("[subscope]", {
       event: "project_new.route_error",
-      reason: error.message,
       digest: error.digest,
     });
   }, [error]);

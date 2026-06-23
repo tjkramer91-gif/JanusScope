@@ -22,7 +22,7 @@ export default async function DashboardPage({
   const projectSummaries = projects.map((project) => ({
     id: project.id,
     name: project.name,
-    location: `${project.city}, ${project.state}`,
+    location: [project.city, project.state].filter(Boolean).join(", ") || project.projectAddress || "Location not set",
     statusLabel: PROJECT_STATUS_LABELS[project.status],
     riskText: project.riskScore === null ? "Pending review and project setup." : `Risk ${project.riskScore}/100 · ${project.riskLevel}`,
     href: project.status === "report-ready" ? `/app/projects/${project.id}/report` : `/app/projects/${project.id}/upload`,

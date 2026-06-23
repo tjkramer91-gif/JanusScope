@@ -6,7 +6,6 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
   useEffect(() => {
     console.error("[subscope]", {
       event: "app.route_error",
-      reason: error.message,
       digest: error.digest,
     });
   }, [error]);

@@ -62,7 +62,7 @@ export default async function ReportsPage() {
                   Open Report
                 </Link>
                 <Link className="button-secondary" href={`/app/projects/${project.id}/report/pdf`}>
-                  PDF Placeholder
+                  Export PDF
                 </Link>
                 <Link className="button-secondary" href={`/app/projects/${project.id}/report/csv`}>
                   CSV Issue Log

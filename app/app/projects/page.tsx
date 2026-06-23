@@ -41,7 +41,9 @@ export default async function ProjectsPage() {
                 <div>
                   <p className="eyebrow">{PROJECT_STATUS_LABELS[project.status]}</p>
                   <h2 className="mt-2 text-xl font-semibold text-ink">{project.name}</h2>
-                  <p className="mt-2 text-sm text-moss">{project.city}, {project.state}</p>
+                  <p className="mt-2 text-sm text-moss">
+                    {[project.city, project.state].filter(Boolean).join(", ") || project.projectAddress || "Location not set"}
+                  </p>
                 </div>
                 <span className="rounded-full border border-line/60 bg-paper px-3 py-1 text-xs font-semibold text-moss">
                   {project.uploadedFiles.length} file{project.uploadedFiles.length === 1 ? "" : "s"}

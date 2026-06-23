@@ -3,6 +3,7 @@ import { buildHtmlReport } from "@/lib/report";
 import { generateRiskReview } from "@/lib/risk-engine";
 import { requireUser } from "@/lib/server/auth";
 import { addAudit, getProject } from "@/lib/server/store";
+import { trackUsageEvent } from "@/lib/server/usage";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params;
@@ -28,6 +29,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     });
     await browser.close();
     await addAudit(user, project.id, "pdf.downloaded", {});
+    await trackUsageEvent(user, "pdf_downloaded", {
+      projectId: project.id,
+      eventMetadata: {
+        riskScore: project.riskScore,
+        riskLevel: project.riskLevel,
+      },
+    });
 
     return new NextResponse(new Uint8Array(pdf), {
       headers: {

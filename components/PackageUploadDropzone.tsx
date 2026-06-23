@@ -34,7 +34,7 @@ export function PackageUploadDropzone() {
         <div>
           <h2 className="section-title">Upload everything you want reviewed</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-            JanusScope will classify the documents automatically.
+            Put the package in one place. JanusScope will classify files after upload and route the review around the highest-risk documents first.
           </p>
           <p className="mt-2 text-xs font-semibold uppercase text-moss">
             PDF, DOCX, XLSX, CSV, PNG, and JPG supported
@@ -67,6 +67,22 @@ export function PackageUploadDropzone() {
             </ul>
           </div>
         )}
+      </div>
+      <div className="mt-5 grid gap-3 md:grid-cols-4">
+        {[
+          ["1", "Intake", "Upload the full package"],
+          ["2", "Classify", "Detect contracts, bids, budgets, RFIs, and reports"],
+          ["3", "Review", "Prioritize risk, missing scope, and conflicts"],
+          ["4", "Export", "Create a report and issue log"],
+        ].map(([number, title, body]) => (
+          <div className="rounded-[18px] border border-line/60 bg-white p-4" key={title}>
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eaf3ff] text-xs font-semibold text-steel">
+              {number}
+            </span>
+            <p className="mt-3 text-sm font-semibold text-ink">{title}</p>
+            <p className="mt-1 text-xs leading-5 text-moss">{body}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

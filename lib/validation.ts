@@ -1,25 +1,21 @@
 import { z } from "zod";
 
-export const optionalMoneySchema = z
-  .string()
-  .trim()
-  .transform((value) => (value === "" ? null : Number(value)))
-  .pipe(z.number().nonnegative().nullable());
+const optionalTextSchema = z.preprocess(
+  (value) => (typeof value === "string" ? value : ""),
+  z.string().trim(),
+);
 
-export const projectInputSchema = z.object({
-  name: z.string().trim().min(1, "Project name is required"),
-  projectAddress: z.string().trim().min(1, "Project address is required"),
-  city: z.string().trim().min(1, "City is required"),
-  state: z.string().trim().min(2, "State is required"),
-  zip: z.string().trim().optional().default(""),
-  tradeType: z.string().trim().optional().default(""),
-  gcName: z.string().trim().optional().default(""),
-  ownerName: z.string().trim().optional().default(""),
-  projectNotes: z.string().trim().optional().default(""),
-  contractAmount: optionalMoneySchema,
-  bidDate: z.string().trim().optional().default(""),
-  executionDeadline: z.string().trim().optional().default(""),
-  projectType: z.enum([
+export const optionalMoneySchema = z
+  .preprocess(
+    (value) => (typeof value === "string" ? value.trim() : ""),
+    z.string()
+      .transform((value) => (value === "" ? null : Number(value)))
+      .pipe(z.number().nonnegative().nullable()),
+  );
+
+const projectTypeSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() ? value : "commercial"),
+  z.enum([
     "multifamily",
     "affordable-housing",
     "commercial",
@@ -29,9 +25,40 @@ export const projectInputSchema = z.object({
     "public-works",
     "other",
   ]),
-  hasMasterServiceAgreement: z.enum(["yes", "no", "not-sure"]),
-  publicOrPrivate: z.enum(["public", "private", "not-sure"]),
-  prevailingWageStatus: z.enum(["yes", "no", "not-sure"]),
+);
+
+const msaStatusSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() ? value : "not-sure"),
+  z.enum(["yes", "no", "not-sure"]),
+);
+
+const publicPrivateSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() ? value : "not-sure"),
+  z.enum(["public", "private", "not-sure"]),
+);
+
+const prevailingWageSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() ? value : "not-sure"),
+  z.enum(["yes", "no", "not-sure"]),
+);
+
+export const projectInputSchema = z.object({
+  name: z.string().trim().min(1, "Project name is required"),
+  projectAddress: optionalTextSchema,
+  city: optionalTextSchema,
+  state: optionalTextSchema,
+  zip: optionalTextSchema,
+  tradeType: optionalTextSchema,
+  gcName: optionalTextSchema,
+  ownerName: optionalTextSchema,
+  projectNotes: optionalTextSchema,
+  contractAmount: optionalMoneySchema,
+  bidDate: optionalTextSchema,
+  executionDeadline: optionalTextSchema,
+  projectType: projectTypeSchema,
+  hasMasterServiceAgreement: msaStatusSchema,
+  publicOrPrivate: publicPrivateSchema,
+  prevailingWageStatus: prevailingWageSchema,
 });
 
 export const uploadTextSchema = z.object({

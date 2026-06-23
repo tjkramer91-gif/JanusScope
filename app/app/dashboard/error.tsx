@@ -6,7 +6,6 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
   useEffect(() => {
     console.error("[subscope]", {
       event: "dashboard.route_error",
-      reason: error.message,
       digest: error.digest,
     });
   }, [error]);

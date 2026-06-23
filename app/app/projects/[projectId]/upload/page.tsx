@@ -25,6 +25,12 @@ export default async function UploadPage({
 
   const uploadAction = uploadDocumentsAction.bind(null, project.id);
   const uploadedCount = Number(status.uploaded ?? 0);
+  const extractedCount = project.uploadedFiles.filter((file) => file.extractionStatus === "extracted").length;
+  const includedCount = project.uploadedFiles.filter((file) => file.includedInReview).length;
+  const classifiedCount = project.uploadedFiles.filter((file) => file.processingStatus === "classified").length;
+  const detectedCategories = Array.from(
+    new Set(project.uploadedFiles.map((file) => file.documentCategory ?? classifyUploadedFile(file).label)),
+  ).filter(Boolean);
 
   return (
     <div className="mx-auto max-w-[1220px] space-y-8">
@@ -48,6 +54,44 @@ export default async function UploadPage({
         </StatusBanner>
       ) : null}
       {status.error ? <StatusBanner tone="error">{status.error}</StatusBanner> : null}
+
+      <section className="grid gap-4 md:grid-cols-4">
+        {[
+          ["Uploaded files", project.uploadedFiles.length],
+          ["Classified files", classifiedCount],
+          ["Text extracted", extractedCount],
+          ["Included in review", includedCount],
+        ].map(([label, value]) => (
+          <div className="card p-6" key={label}>
+            <p className="text-xs font-semibold uppercase text-moss">{label}</p>
+            <p className="mt-3 text-3xl font-semibold text-ink">{value}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="card p-6 sm:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow">Package intelligence</p>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">Document classification status</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
+              JanusScope classifies every uploaded file. CSV files are text-extracted for source-backed review today; PDF, DOCX, XLSX, PNG, and JPG files are stored and classified while deeper parsing is expanded.
+            </p>
+          </div>
+          <span className="rounded-full border border-line/60 bg-paper px-4 py-2 text-xs font-semibold text-moss">
+            {detectedCategories.length > 0 ? `${detectedCategories.length} document type${detectedCategories.length === 1 ? "" : "s"} detected` : "Waiting for upload"}
+          </span>
+        </div>
+        {detectedCategories.length > 0 ? (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {detectedCategories.map((category) => (
+              <span className="rounded-full border border-line/60 bg-paper px-4 py-2 text-xs font-semibold text-moss" key={category}>
+                {category}
+              </span>
+            ))}
+          </div>
+        ) : null}
+      </section>
 
       <form action={uploadAction} className="space-y-6">
         <section className="card p-8 sm:p-10">

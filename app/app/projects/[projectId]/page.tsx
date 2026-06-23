@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProjectBrainPanel } from "@/components/ProjectBrainPanel";
 import { PROJECT_STATUS_LABELS } from "@/lib/catalogs";
 import { formatCurrency } from "@/lib/format";
+import { generateRiskReview } from "@/lib/risk-engine";
 import { requireUser } from "@/lib/server/auth";
-import { getProject } from "@/lib/server/store";
+import { getProject, getProjectMemory, upsertProjectMemory } from "@/lib/server/store";
+import { trackUsageEvent } from "@/lib/server/usage";
 
 export default async function ProjectDetailPage({
   params,
@@ -14,6 +17,17 @@ export default async function ProjectDetailPage({
   const user = await requireUser();
   const project = await getProject(user, projectId);
   if (!project) notFound();
+  const review = generateRiskReview(project);
+  await upsertProjectMemory(user, project, review);
+  const memory = await getProjectMemory(user, project.id);
+  await trackUsageEvent(user, "project_brain_viewed", {
+    projectId: project.id,
+    eventMetadata: {
+      status: project.status,
+      uploadedFiles: project.uploadedFiles.length,
+      riskLevel: project.riskLevel || "pending",
+    },
+  });
 
   return (
     <div className="mx-auto max-w-[1120px] space-y-8">
@@ -28,6 +42,9 @@ export default async function ProjectDetailPage({
         <div className="flex flex-wrap gap-2">
           <Link className="button-primary" href={`/app/projects/${project.id}/upload`}>
             Upload Documents
+          </Link>
+          <Link className="button-secondary" href={`/app/projects/${project.id}/budgetscope`}>
+            BudgetScope
           </Link>
           <Link className="button-secondary" href={`/app/projects/${project.id}/report`}>
             Open Report
@@ -68,11 +85,14 @@ export default async function ProjectDetailPage({
         </div>
       </section>
 
+      <ProjectBrainPanel project={project} memory={memory} review={review} />
+
       <section className="card p-8 sm:p-10">
         <p className="eyebrow">Next steps</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             ["Upload package", `/app/projects/${project.id}/upload`],
+            ["Import budget", `/app/projects/${project.id}/budgetscope`],
             ["Review questions", `/app/projects/${project.id}/questions`],
             ["Open report", `/app/projects/${project.id}/report`],
             ["Run another workflow", "/app/workflows"],

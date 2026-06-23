@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_PATHS = new Set(["/", "/auth/login", "/auth/signup", "/auth/callback", "/auth/logout"]);
+const PUBLIC_PATHS = new Set([
+  "/",
+  "/auth/login",
+  "/auth/signup",
+  "/auth/callback",
+  "/auth/logout",
+  "/sample-report",
+  "/security",
+  "/subscope",
+  "/trust",
+]);
 
 function nextWithSessionHeaders(request: NextRequest): NextResponse {
   const requestHeaders = new Headers(request.headers);

@@ -98,7 +98,7 @@ export function buildPrioritizedReport({
         `${finding.title} ${finding.impact} ${finding.whyItMatters}`,
       ),
     ),
-  ).slice(0, 5);
+  ).slice(0, 10);
 
   const contractTraps = sortFindings(
     allFindings.filter((finding) =>
@@ -106,7 +106,7 @@ export function buildPrioritizedReport({
         `${finding.title} ${finding.whyItMatters}`,
       ),
     ),
-  ).slice(0, 5);
+  ).slice(0, 10);
 
   const missingInformation = [
     ...sourceVerification.missingInformation.map((item) => ({
@@ -128,13 +128,13 @@ export function buildPrioritizedReport({
   return {
     overallRisk: review.overallRating,
     detectedTrade,
-    topRisks: allFindings.slice(0, 5),
+    topRisks: allFindings.slice(0, 10),
     biggestCostMisses,
     contractTraps,
-    missingInformation: missingInformation.slice(0, 8),
+    missingInformation: missingInformation.slice(0, 10),
     questionsToAsk: review.questions
       .map((question) => question.question)
       .filter((question) => !isChecklistStyleQuestion(question))
-      .slice(0, 8),
+      .slice(0, 10),
   };
 }

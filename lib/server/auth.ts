@@ -64,7 +64,7 @@ export async function requireUser(): Promise<SessionUser> {
   if (!user) {
     const headerStore = await headers();
     const requestedPath = headerStore.get("x-subscope-request-path") ?? "/app/dashboard";
-    const returnTo = requestedPath.startsWith("/app") ? requestedPath : "/app/dashboard";
+    const returnTo = requestedPath.startsWith("/app") || requestedPath.startsWith("/admin") ? requestedPath : "/app/dashboard";
     logEvent("warn", "auth.required.redirect", { destination: "/auth/login" });
     redirect(`/auth/login?returnTo=${encodeURIComponent(returnTo)}`);
   }

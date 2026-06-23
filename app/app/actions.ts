@@ -10,6 +10,7 @@ import { buildProjectIntelligenceGraph } from "@/lib/intelligence-graph";
 import { generateRiskReview } from "@/lib/risk-engine";
 import { requireUser, type SessionUser } from "@/lib/server/auth";
 import { errorMessage, logEvent } from "@/lib/server/logger";
+import { trackUsageEvent } from "@/lib/server/usage";
 import { reviewFocusLabels } from "@/lib/review-focus";
 import {
   createProject,
@@ -67,7 +68,15 @@ async function generateAndSaveReview(user: SessionUser, project: Project): Promi
   const analysisJson = buildRiskAnalysisJson(completedProject, review);
   const intelligenceHistory = await listIntelligenceGraphs(user, { excludeProjectId: completedProject.id });
   const intelligenceGraph = buildProjectIntelligenceGraph(completedProject, review, intelligenceHistory);
-  await saveReview(user, completedProject, analysisJson, intelligenceGraph);
+  await saveReview(user, completedProject, analysisJson, intelligenceGraph, review);
+  await trackUsageEvent(user, "report_generated", {
+    projectId: completedProject.id,
+    eventMetadata: {
+      riskScore: completedProject.riskScore,
+      riskLevel: completedProject.riskLevel,
+      status: completedProject.status,
+    },
+  });
   if (completedProject.deleteDocumentsAfterReport) {
     await purgeProjectUploadedBinaries(user, completedProject.id);
   }
@@ -120,6 +129,14 @@ export async function createProjectAction(formData: FormData) {
   try {
     const { projectNotes, ...projectInput } = input.data;
     project = await createProject(user, projectInput);
+    await trackUsageEvent(user, "project_created", {
+      projectId: project.id,
+      eventMetadata: {
+        projectType: project.projectType,
+        tradeType: project.tradeType,
+        state: project.state,
+      },
+    });
     if (projectNotes) {
       project = await saveProject(user, { ...project, notesText: projectNotes }, "project.notes.saved");
     }
@@ -202,7 +219,26 @@ export async function uploadDocumentsAction(projectId: string, formData: FormDat
     for (const file of files) {
       const documentType = batchDocumentType === "other" ? classifyFileName(file.name) : batchDocumentType;
       const saved = await saveUploadedFile(user, project, file, documentType);
-      if (saved) uploaded.push(saved);
+      if (saved) {
+        uploaded.push(saved);
+        await trackUsageEvent(user, "document_uploaded", {
+          projectId,
+          eventMetadata: {
+            fileSize: saved.size,
+            fileType: saved.type,
+            documentType: saved.documentId,
+            extractionStatus: saved.extractionStatus,
+          },
+        });
+        await trackUsageEvent(user, "document_classified", {
+          projectId,
+          eventMetadata: {
+            documentType: saved.documentId,
+            documentCategory: saved.backendDocumentCategory ?? saved.documentCategory ?? "Unknown",
+            extractionConfidence: saved.extractionConfidence,
+          },
+        });
+      }
     }
   } catch (error) {
     logEvent("error", "upload.save_failed", { userId: user.id, projectId, reason: errorMessage(error) });
@@ -249,6 +285,12 @@ export async function updateDocumentTypeAction(projectId: string, fileId: string
   };
   nextProject.documents = syncDocumentAvailability(nextProject);
   await saveProject(user, nextProject, "file.classified");
+  await trackUsageEvent(user, "document_classified", {
+    projectId,
+    eventMetadata: {
+      documentType: documentId,
+    },
+  });
   revalidatePath(`/app/projects/${projectId}/upload`);
 }
 

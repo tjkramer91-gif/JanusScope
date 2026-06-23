@@ -6,7 +6,8 @@ import { safeReturnTo } from "@/lib/return-to";
 import { isDemoAccessEnabled, makeDemoUser, setSession } from "@/lib/server/auth";
 import { errorMessage, logEvent } from "@/lib/server/logger";
 import { hashPassword, verifyPassword } from "@/lib/server/password";
-import { createPasswordUser, ensureWorkspace, findPasswordUserByEmail } from "@/lib/server/store";
+import { markUserLogin, createPasswordUser, ensureWorkspace, findPasswordUserByEmail } from "@/lib/server/store";
+import { trackUsageEvent } from "@/lib/server/usage";
 
 export interface AuthFormState {
   error: string;
@@ -38,12 +39,15 @@ export async function loginAction(_previousState: AuthFormState, formData: FormD
       return { error: "Email or password is incorrect." };
     }
 
-    await setSession({
+    const sessionUser = {
       id: user.id,
       auth0UserId: user.auth0UserId,
       email: user.email,
       name: user.name,
-    });
+    };
+    await setSession(sessionUser);
+    await markUserLogin(sessionUser);
+    await trackUsageEvent(sessionUser, "login", { eventMetadata: { accountType: user.accountType, role: user.role } });
     logEvent("info", "auth.login.succeeded", { userId: user.id });
   } catch (error) {
     logEvent("error", "auth.login.error", { reason: errorMessage(error) });
@@ -69,6 +73,8 @@ export async function signupAction(_previousState: AuthFormState, formData: Form
     const passwordHash = await hashPassword(password);
     const user = await createPasswordUser(email, passwordHash);
     await setSession(user);
+    await markUserLogin(user);
+    await trackUsageEvent(user, "signup", { eventMetadata: { accountType: "individual" } });
     logEvent("info", "auth.signup.succeeded", { userId: user.id });
   } catch (error) {
     logEvent("error", "auth.signup.error", { reason: errorMessage(error) });
@@ -91,6 +97,8 @@ export async function demoAccessAction(formData: FormData): Promise<void> {
   const user = makeDemoUser();
   await setSession(user);
   await ensureWorkspace(user);
+  await markUserLogin(user);
+  await trackUsageEvent(user, "login", { eventMetadata: { accountType: "demo" } });
   logEvent("info", "auth.demo.succeeded", { userId: user.id });
   redirect(safeReturnTo(returnTo));
 }

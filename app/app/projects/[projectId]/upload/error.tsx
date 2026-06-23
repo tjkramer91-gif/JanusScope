@@ -6,7 +6,6 @@ export default function UploadError({ error, reset }: { error: Error & { digest?
   useEffect(() => {
     console.error("[subscope]", {
       event: "upload.route_error",
-      reason: error.message,
       digest: error.digest,
     });
   }, [error]);

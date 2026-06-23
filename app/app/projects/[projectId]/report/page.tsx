@@ -90,7 +90,7 @@ export default async function ReportPage({ params }: { params: Promise<{ project
       </section>
 
       <RiskSummary project={project} review={review} />
-      <PriorityRiskOutput report={priorityReport} />
+      <PriorityRiskOutput report={priorityReport} review={review} />
 
       {syntheticDemo ? (
         <section className="card border border-steel/20 bg-white p-6">

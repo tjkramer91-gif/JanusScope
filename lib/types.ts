@@ -1,5 +1,60 @@
 export type Severity = "low" | "medium" | "high" | "critical";
 
+export type AccountType = "demo" | "individual" | "company" | "admin";
+
+export type CompanyType =
+  | "Subcontractor"
+  | "General Contractor"
+  | "Developer"
+  | "Owner"
+  | "Architect"
+  | "Consultant"
+  | "Vendor"
+  | "Other";
+
+export type ConsentStatus = "not-requested" | "granted" | "declined" | "revoked";
+
+export type RenovationOrNew = "renovation" | "new-construction" | "mixed" | "unknown";
+
+export type BackendDocumentCategory =
+  | "Budget"
+  | "Bid"
+  | "Subcontract"
+  | "Master Service Agreement"
+  | "Scope Sheet"
+  | "Drawing"
+  | "Specification"
+  | "Report"
+  | "Schedule"
+  | "RFI"
+  | "Change Order"
+  | "Photos"
+  | "Other"
+  | "Unknown";
+
+export type DataReviewStatus = "raw" | "pending_review" | "approved" | "rejected" | "excluded_from_learning";
+
+export type UsageEventType =
+  | "signup"
+  | "login"
+  | "project_created"
+  | "document_uploaded"
+  | "document_classified"
+  | "report_generated"
+  | "pdf_downloaded"
+  | "project_brain_viewed"
+  | "budget_uploaded"
+  | "budget_column_mapped"
+  | "budget_compared"
+  | "budget_report_generated"
+  | "pricing_item_extracted"
+  | "risk_finding_created"
+  | "feedback_submitted"
+  | "admin_data_approved"
+  | "admin_data_rejected"
+  | "admin_data_excluded"
+  | "lead_score_updated";
+
 export type ProjectType =
   | "multifamily"
   | "affordable-housing"
@@ -72,18 +127,27 @@ export interface DocumentAvailability {
 
 export interface UploadedFile {
   id: string;
+  companyId?: string;
   name: string;
   size: number;
   type: string;
   documentId: DocumentId;
   documentCategory?: VerificationDocumentCategory;
+  backendDocumentCategory?: BackendDocumentCategory;
   storagePath: string;
+  filePath?: string;
   processingStatus: DocumentProcessingStatus;
   extractionStatus?: TextExtractionStatus;
+  extractionConfidence?: number | null;
   extractionMessage?: string;
   extractedText?: string;
   reviewedSectionCount?: number;
   includedInReview?: boolean;
+  sensitiveDataDetected?: boolean;
+  allowedForAnonymizedLearning?: boolean;
+  deleteAfterReportGeneration?: boolean;
+  excludedFromBenchmarking?: boolean;
+  consentStatus?: ConsentStatus;
   uploadedAt: string;
 }
 
@@ -96,11 +160,13 @@ export interface IntakeAnswer {
 export interface Project {
   id: string;
   organizationId: string;
+  companyId: string;
   userId: string;
   name: string;
   projectAddress: string;
   city: string;
   state: string;
+  region: string;
   zip: string;
   tradeType: string;
   gcName: string;
@@ -112,10 +178,21 @@ export interface Project {
   publicOrPrivate: PublicPrivateStatus;
   prevailingWageStatus: PrevailingWageStatus;
   projectType: ProjectType;
+  assetType: string;
+  renovationOrNew: RenovationOrNew;
+  unitCount: number | null;
+  grossSquareFeet: number | null;
+  rentableSquareFeet: number | null;
+  buildingCount: number | null;
+  fundingType: string;
+  currentPhase: string;
   status: ProjectStatus;
   riskScore: number | null;
   riskLevel: string;
+  allowedForAnonymizedLearning: boolean;
   deleteDocumentsAfterReport: boolean;
+  excludedFromBenchmarking: boolean;
+  consentStatus: ConsentStatus;
   documents: DocumentAvailability[];
   uploadedFiles: UploadedFile[];
   intakeAnswers: IntakeAnswer[];
