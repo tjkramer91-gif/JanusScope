@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const schema = readFileSync(join(process.cwd(), "supabase/schema.sql"), "utf8").toLowerCase();
 
 describe("supabase backend foundation schema", () => {
-  it("contains the Project Brain, admin intelligence, feedback, and usage tables", () => {
+  it("contains the Project Brain, admin review, feedback, and usage tables", () => {
     for (const table of [
       "companies",
       "project_memory",

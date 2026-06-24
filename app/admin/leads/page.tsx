@@ -9,7 +9,7 @@ export default async function AdminLeadsPage() {
   return (
     <AdminSection>
       <AdminPageHeader
-        title="Lead intelligence"
+        title="Lead activity"
         description="Admin-only view of high-intent users and companies based on JanusScope usage, uploads, BudgetScope activity, reports, exports, and feedback."
       />
       <AdminTable

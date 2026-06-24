@@ -56,7 +56,7 @@ async function createSyntheticProject(store: typeof import("@/lib/server/store")
   });
 }
 
-describe("lead intelligence", () => {
+describe("lead activity tracking", () => {
   it("updates lead score after high-intent usage events and lists admin leads", async () => {
     const dataDir = mkdtempSync(join(tmpdir(), "januscope-leads-"));
     tempDirs.push(dataDir);
@@ -108,7 +108,7 @@ describe("lead intelligence", () => {
     });
   });
 
-  it("blocks non-admin users from lead intelligence", async () => {
+  it("blocks non-admin users from lead activity", async () => {
     const dataDir = mkdtempSync(join(tmpdir(), "januscope-leads-"));
     tempDirs.push(dataDir);
     vi.stubEnv("SUBSCOPE_DATA_DIR", dataDir);

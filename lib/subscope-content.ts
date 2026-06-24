@@ -80,11 +80,11 @@ export const COMING_SOON_PRODUCTS = [
   {
     name: "DevScope",
     audience: "Owners and developers",
-    body: "Future project intelligence for developer-side scope, budget, document, and execution risk.",
+    body: "Future workflow support for developer-side scope, budget, document, and execution risk.",
   },
   {
     name: "GCScope",
     audience: "General contractors",
-    body: "Future subcontractor, buyout, change order, and project controls intelligence for GC teams.",
+    body: "Future workflow support for subcontractor review, buyout, change orders, and project controls for GC teams.",
   },
 ];

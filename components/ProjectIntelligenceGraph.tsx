@@ -28,10 +28,10 @@ export function ProjectIntelligenceGraph({ graph }: { graph: IntelligenceGraph }
     <section className="card p-8 sm:p-10">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="eyebrow">Project intelligence</p>
+          <p className="eyebrow">Project Brain</p>
           <h2 className="mt-2 text-2xl font-semibold text-ink">Graph-shaped memory from this review</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
-            SubScope now saves the review as connected project facts, risk categories, issue patterns, missing documents, and GC questions. This is a memory layer, not a visual graph yet.
+            SubScope saves the review as connected project facts, risk categories, issue patterns, missing documents, and GC questions. This is a working memory layer, not a public pricing source.
           </p>
         </div>
         <span className="rounded-full border border-line/60 bg-paper px-4 py-2 text-xs font-semibold text-moss">

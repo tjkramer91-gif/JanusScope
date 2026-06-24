@@ -6,7 +6,7 @@ export function SubScopeMemory({ compact = false }: { compact?: boolean }) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="eyebrow">JanusScope Memory</p>
-          <h2 className="mt-2 text-2xl font-semibold text-ink">Static placeholder for project intelligence</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-ink">Static placeholder for Project Brain</h2>
         </div>
         <span className="rounded-full border border-line/60 bg-paper px-4 py-2 text-xs font-semibold text-moss">
           Planned

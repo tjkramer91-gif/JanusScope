@@ -10,7 +10,7 @@ export default async function AdminCompaniesPage() {
     <AdminSection>
       <AdminPageHeader
         title="Companies"
-        description="Basic company records used for account grouping, lead visibility, and future admin intelligence."
+        description="Basic company records used for account grouping, lead visibility, and future admin review workflows."
       />
       <AdminTable
         columns={["Company", "Type", "Trade", "City", "State", "Lead status", "Created"]}

@@ -72,7 +72,7 @@ export default async function UploadPage({
       <section className="card p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="eyebrow">Package intelligence</p>
+            <p className="eyebrow">Document review</p>
             <h2 className="mt-2 text-2xl font-semibold text-ink">Document classification status</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-moss">
               JanusScope classifies every uploaded file. CSV files are text-extracted for source-backed review today; PDF, DOCX, XLSX, PNG, and JPG files are stored and classified while deeper parsing is expanded.

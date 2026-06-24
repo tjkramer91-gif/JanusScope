@@ -3122,7 +3122,7 @@ function moduleForUsageEvent(eventType: UsageEventType): string {
   if (eventType.startsWith("budget_")) return "BudgetScope";
   if (eventType.includes("document")) return "Document intake";
   if (eventType.includes("report") || eventType === "pdf_downloaded") return "Reports";
-  if (eventType.includes("admin_data") || eventType.includes("pricing")) return "Admin intelligence";
+  if (eventType.includes("admin_data") || eventType.includes("pricing")) return "Admin review";
   if (eventType.includes("feedback")) return "Feedback";
   if (eventType.includes("project")) return "Projects";
   return "Core app";
@@ -4055,7 +4055,7 @@ function calculateLeadScore(input: {
   addAction(highIntentActions, input.feedbackCount > 0, "Submitted feedback");
   addAction(highIntentActions, input.projects.length >= 2, "Created multiple projects");
   addAction(highIntentActions, activeDays >= 2, "Used JanusScope repeatedly over multiple days");
-  addAction(highIntentActions, input.benchmarkActivity > 0, "Interacted with reviewed pricing intelligence");
+  addAction(highIntentActions, input.benchmarkActivity > 0, "Interacted with reviewed budget and pricing records");
   const lastActivityAt = input.usageEvents
     .map((event) => event.createdAt)
     .sort()

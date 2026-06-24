@@ -1,6 +1,27 @@
 # JanusScope
 
-JanusScope is an AI construction help platform for scope, contracts, bids, RFIs, change orders, budgets, project communication, and practical risk review. The current MVP keeps the proven SubScope package review engine, then adds the broader JanusScope workbench with guided workflows, Ask Janus, a prompt library, templates, projects, reports, consulting request, and settings surfaces. It uses Next.js App Router, TypeScript, Tailwind CSS, Zod validation, email/password authentication, Supabase-backed project storage, server-side project access checks, Playwright PDF generation, and CSV issue-log export.
+JanusScope is an AI construction education and software platform that helps construction professionals learn, review, organize, and work through project documents, scopes, risks, bid questions, and construction workflows. The current MVP keeps the proven SubScope package review engine, then adds the broader JanusScope workbench with guided workflows, Ask Janus, a prompt library, templates, projects, reports, consulting request, and settings surfaces. It uses Next.js App Router, TypeScript, Tailwind CSS, Zod validation, email/password authentication, Supabase-backed project storage, server-side project access checks, Playwright PDF generation, and CSV issue-log export.
+
+## Positioning And Terminology
+
+Use clear, practical construction language. JanusScope is a construction education and workflow software platform powered by AI. It helps owners, developers, general contractors, subcontractors, estimators, project managers, superintendents, affordable housing teams, and consultants review documents, understand scope, organize project risk, and ask better questions.
+
+JanusScope is not a data brokerage, public pricing source, estimating replacement, legal review tool, code compliance engine, or replacement for experienced construction professionals.
+
+Terminology map:
+
+| Avoid | Use instead |
+| --- | --- |
+| Bid intelligence platform | Construction education and software platform |
+| Construction data analytics | Construction document review, education, and workflow tools |
+| Predictive construction intelligence | AI-guided construction review and planning support |
+| Pricing intelligence | Budget review, scope comparison, and estimating support |
+| Automated bid analytics | AI-assisted bid review and scope leveling |
+| Construction intelligence platform | Construction education and workflow software platform |
+
+Preferred product description:
+
+> JanusScope is an AI construction education and software platform that helps construction professionals review project documents, understand scope, identify risk, and ask better questions before work begins.
 
 ## What Was Built
 

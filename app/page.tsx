@@ -47,15 +47,15 @@ export default function LandingPage() {
       <section className="overflow-hidden">
         <div className="mx-auto grid max-w-[1180px] gap-12 px-5 py-16 lg:grid-cols-[1.03fr_0.97fr] lg:px-8 lg:py-20">
           <div className="flex flex-col justify-center">
-            <p className="eyebrow">Construction intelligence platform</p>
+            <p className="eyebrow">AI construction education and software platform</p>
             <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight tracking-normal text-ink md:text-6xl">
-              Construction Intelligence for Owners, General Contractors, and Subcontractors
+              Learn, review, and organize construction project information before work gets expensive.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-moss">
-              Identify scope gaps, contract risk, pricing inconsistencies, and project exposure before they become change orders.
+              JanusScope helps construction professionals review project documents, understand scope, identify risk, and ask better questions before work begins.
             </p>
             <p className="mt-4 max-w-3xl text-base font-semibold leading-7 text-ink">
-              Built for the gray areas where bids, contracts, budgets, RFIs, field conditions, codes, funding requirements, and real project judgment do not line up cleanly.
+              Built for owners, developers, general contractors, subcontractors, estimators, project managers, and field teams working through the gray areas of construction.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link className="button-primary px-6 py-3" href="/auth/login?returnTo=/app/dashboard">

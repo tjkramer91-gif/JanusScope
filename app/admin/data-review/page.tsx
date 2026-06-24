@@ -32,7 +32,7 @@ export default async function AdminDataReviewPage({
     <AdminSection>
       <AdminPageHeader
         title="Data review queue"
-        description="Review extracted pricing, scope, and risk intelligence before it becomes eligible for benchmark use."
+        description="Review extracted budget, scope, and risk records before they become eligible for consented internal comparison use."
       />
 
       <form className="grid gap-4 rounded-[18px] border border-line/70 bg-white p-5 shadow-sm md:grid-cols-5">
