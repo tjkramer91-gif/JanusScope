@@ -19,12 +19,12 @@ export default function LandingPage() {
         fill
         priority
         sizes="100vw"
-        src="/images/janus-construction-advisory-hero-v2.png"
+        src="/images/janus-construction-advisory-hero-v3.png"
       />
 
-      <div className="absolute inset-0 bg-black/30" />
-      <div className="absolute inset-0 hidden bg-gradient-to-r from-black/90 via-black/55 to-black/10 sm:block" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/20 sm:hidden" />
+      <div className="absolute inset-0 bg-black/10" />
+      <div className="absolute inset-0 hidden bg-gradient-to-r from-black/80 via-black/35 to-transparent sm:block" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent sm:hidden" />
 
       <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1280px] flex-col justify-end px-6 pb-10 pt-24 sm:justify-center sm:px-10 sm:py-16 lg:px-16">
         <section className="max-w-2xl" aria-labelledby="under-construction-title">
