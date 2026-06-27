@@ -18,7 +18,6 @@ export default function LandingPage() {
         className="object-cover object-[84%_center] sm:object-center"
         fill
         priority
-        quality={90}
         sizes="100vw"
         src="/images/janus-construction-advisory-hero.png"
       />
