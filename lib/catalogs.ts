@@ -50,7 +50,6 @@ export const RISK_CATEGORY_LABELS: Record<RiskCategory, string> = {
 
 export const PROJECT_TYPE_LABELS: Record<Project["projectType"], string> = {
   multifamily: "Multifamily",
-  "affordable-housing": "Affordable housing",
   commercial: "Commercial",
   "tenant-improvement": "Tenant improvement",
   civil: "Civil",

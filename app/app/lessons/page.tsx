@@ -14,7 +14,7 @@ const SAMPLE_LESSONS = [
     summary: "Scope assumed empty units. Field reality required crew time for resident furniture and repeat visits.",
   },
   {
-    title: "PCNA immediate needs not matched in GC budget",
+    title: "Due diligence report needs not matched in GC budget",
     trade: "General",
     phase: "Due diligence",
     summary: "Capital needs report called out urgent envelope repairs that were only partially covered in pricing.",

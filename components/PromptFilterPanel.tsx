@@ -22,7 +22,7 @@ export function PromptFilterPanel({
             className="field"
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
-            placeholder="Scope gap, owner memo, RFI, NSPIRE, due diligence..."
+            placeholder="Scope gap, owner memo, RFI, due diligence..."
           />
         </label>
         {fields.map((field) => (

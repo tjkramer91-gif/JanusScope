@@ -411,8 +411,8 @@ export function generateRiskReview(project: Project, asOf = new Date()): RiskRev
     addMissing("Master service agreement", "An existing MSA may change risk, insurance, payment, dispute, or flow-down terms.", "high");
   }
 
-  if ((project.publicOrPrivate === "public" || project.projectType === "public-works" || project.projectType === "affordable-housing") && !hasDocument(project, "wage")) {
-    addMissing("Wage determination or certified payroll requirements", "Public or affordable work may require prevailing wage, certified payroll, or funding compliance.", "high");
+  if ((project.publicOrPrivate === "public" || project.projectType === "public-works") && !hasDocument(project, "wage")) {
+    addMissing("Wage determination or certified payroll requirements", "Public work may require prevailing wage, certified payroll, or funding compliance.", "high");
   }
 
   if (!hasDocument(project, "permit-ahj")) {

@@ -136,7 +136,7 @@ export function sourceVerificationSampleProjectInput(): Omit<
     hasMasterServiceAgreement: "not-sure",
     publicOrPrivate: "private",
     prevailingWageStatus: "not-sure",
-    projectType: "affordable-housing",
+    projectType: "multifamily",
   };
 }
 

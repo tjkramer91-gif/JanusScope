@@ -4,7 +4,6 @@ export type RoleMode =
   | "estimator"
   | "superintendent"
   | "developer-owner"
-  | "affordable-housing"
   | "consultant";
 
 export type WorkflowSlug =
@@ -130,14 +129,6 @@ export interface CalculatorDefinition {
   formulaHint: string;
 }
 
-export interface AffordableHousingModuleDefinition {
-  slug: string;
-  title: string;
-  description: string;
-  inputs: string[];
-  outputs: string[];
-}
-
 export type NavigationItem = readonly [string, string];
 
 export interface NavigationGroup {
@@ -199,12 +190,6 @@ export const ROLE_MODES: RoleDefinition[] = [
     description: "Pressure-test budget, immediate needs, due diligence risk, lender questions, and project assumptions.",
   },
   {
-    id: "affordable-housing",
-    label: "Affordable Housing Team",
-    shortLabel: "Housing",
-    description: "Review NSPIRE, PCNA, occupied rehab, funding requirement areas, and lender-driven scope risk.",
-  },
-  {
     id: "consultant",
     label: "Consultant",
     shortLabel: "Consultant",
@@ -237,7 +222,6 @@ export const PLATFORM_NAVIGATION_GROUPS: readonly NavigationGroup[] = [
     title: "Specialized",
     items: [
       ["/app/requirements", "Requirement Radar"],
-      ["/app/affordable-housing", "Affordable Housing"],
       ["/app/quick-tools", "Quick Tools"],
       ["/app/calculators", "Calculators"],
       ["/app/consulting", "Consulting Request"],
@@ -274,14 +258,13 @@ export const USER_TYPES = [
   "Project managers",
   "Superintendents",
   "Developers and owners",
-  "Affordable housing teams",
   "Consultants",
 ];
 
 export const HOW_JANUS_WORKS = [
   ["Pick the work", "Choose the construction question, workflow, or library entry that matches the task."],
   ["Add project facts", "Paste notes, upload documents, and state what is known, unclear, or risky."],
-  ["Review by role", "Switch the lens to estimator, PM, superintendent, owner, subcontractor, or housing team."],
+  ["Review by role", "Switch the lens to estimator, PM, superintendent, owner, subcontractor, or consultant."],
   ["Generate deliverables", "Create checklists, RFIs, matrices, reports, owner updates, or internal notes."],
   ["Save and reuse", "Attach outputs to a project, export them, or turn them into lessons and playbooks."],
 ];
@@ -330,7 +313,7 @@ export const ROLE_BASED_ACTIONS: Record<RoleMode, DashboardAction[]> = {
     { title: "Browse subcontractor prompts", description: "Open prompts for contract protection, notices, and payment follow-up.", href: "/app/prompts" },
   ],
   "developer-owner": [
-    { title: "Review PCNA", description: "Find immediate needs, budget gaps, and missing scope before closing.", href: "/app/affordable-housing" },
+    { title: "Review due diligence report", description: "Find immediate needs, budget gaps, and missing scope before closing.", href: "/app/workflows/budget-risk" },
     { title: "Review GC budget", description: "Compare carries, allowances, and missing scope against due diligence inputs.", href: "/app/workflows/budget-risk", tag: "Budget" },
     { title: "Find missing scope", description: "Run a top-down practical review across reports, budgets, and scope.", href: "/app/workflows/what-am-i-missing" },
     { title: "Create lender summary", description: "Prepare a concise risk memo for lender or investment review.", href: "/app/reports" },
@@ -339,16 +322,6 @@ export const ROLE_BASED_ACTIONS: Record<RoleMode, DashboardAction[]> = {
     { title: "Generate due diligence questions", description: "Ask better questions before scope, funding, or schedule gets locked.", href: "/app/requirements" },
     { title: "Check funding requirement areas", description: "Issue-spot likely compliance and lender buckets that need review.", href: "/app/requirements" },
     { title: "Browse developer prompts", description: "Open prompts for risk memos, budget review, and contingency questions.", href: "/app/prompts" },
-  ],
-  "affordable-housing": [
-    { title: "Review NSPIRE report", description: "Turn deficiencies into trades, priorities, and field verification needs.", href: "/app/affordable-housing", tag: "Housing" },
-    { title: "Build unit deficiency matrix", description: "Organize unit-by-unit issues and likely scope buckets.", href: "/app/affordable-housing" },
-    { title: "Review PCNA / CNA", description: "Extract immediate needs, short-term capital needs, and missing scope.", href: "/app/affordable-housing" },
-    { title: "Check LIHTC / HUD / funding requirement areas", description: "Identify requirement buckets and verification questions.", href: "/app/requirements" },
-    { title: "Build immediate needs tracker", description: "Separate lender-driven needs from broader renovation scope.", href: "/app/templates" },
-    { title: "Build occupied rehab checklist", description: "Capture phasing, access, relocation, and tenant-impact questions.", href: "/app/affordable-housing" },
-    { title: "Create lender/owner risk memo", description: "Summarize scope, budget, and requirement issues for decision-makers.", href: "/app/reports" },
-    { title: "Generate scope questions for GC / architect", description: "Write focused clarifications around deficiencies and rehab scope.", href: "/app/ask?prompt=Generate%20scope%20questions%20for%20the%20GC%20and%20architect%20based%20on%20these%20housing%20issues." },
   ],
   consultant: [
     { title: "What am I missing?", description: "Run a practical risk review across mixed project inputs.", href: "/app/workflows/what-am-i-missing", tag: "Flagship" },
@@ -612,11 +585,11 @@ export const WORKFLOWS: WorkflowDefinition[] = [
     category: "Requirement review",
     description: "Identify likely requirement buckets that need human verification.",
     purpose: "Help the team identify likely requirement areas to verify based on project type, location, funding type, occupancy, building age, and scope of work. This is issue spotting, not final compliance.",
-    bestFor: ["Owners", "Affordable housing teams", "Consultants", "Project managers"],
+    bestFor: ["Owners", "Consultants", "Project managers"],
     projectPhases: ["Due diligence", "Preconstruction", "Construction"],
     audiences: ["Internal team", "Owner", "Lender", "Executive"],
     inputLabels: ["Project location", "Project type", "Building type", "Occupancy", "Building age", "New construction or renovation", "Occupied or vacant", "Scope of work", "Funding type", "Known AHJ concerns"],
-    reviewFocus: ["Federal requirements", "HUD / NSPIRE", "LIHTC / Section 42", "Local AHJ and code", "Accessibility", "Energy code", "Fire and life safety", "Environmental", "Lender requirements", "Resident notification"],
+    reviewFocus: ["Federal requirements", "Local AHJ and code", "Accessibility", "Energy code", "Fire and life safety", "Environmental", "Lender requirements", "Owner standards", "Resident notification"],
     outputSections: ["Requirement buckets to verify", "Questions to ask", "Documents to request", "Who to verify with", "Inspection risks", "Recommended next action", "Disclaimer"],
     nextActions: ["Verify with AHJ", "Verify with funding agency", "Request missing documents", "Save to project"],
     cta: "Run Requirement Radar",
@@ -794,40 +767,6 @@ export const PROMPTS: PromptDefinition[] = [
     prompt: "Based on the project details below, generate due diligence questions grouped by owner, architect, lender, AHJ, and consultant. Identify likely requirement buckets, missing documents, schedule risks, and what should be verified before relying on the current scope or budget.",
   },
   {
-    id: "housing-nspire",
-    category: "Affordable Housing prompts",
-    role: "Affordable Housing Team",
-    task: "Review NSPIRE report",
-    projectPhase: "Due diligence",
-    trade: "Occupied Rehab",
-    riskType: "Inspection risk",
-    outputType: "Matrix",
-    experienceLevel: "Experienced",
-    title: "Review NSPIRE report and build a deficiency matrix",
-    useCase: "Translate a housing inspection report into scope, priority, and trade assignments.",
-    inputsNeeded: ["NSPIRE report notes", "Unit list", "Occupied or vacant notes", "Scope assumptions"],
-    expectedOutput: "Unit deficiency matrix, trade assignment, priority, immediate needs, field verification questions.",
-    workflowSlug: "what-am-i-missing",
-    prompt: "Review the NSPIRE findings below and turn them into a deficiency matrix. Separate immediate needs from broader renovation scope, assign likely trades, flag occupied-unit concerns, estimate likely cost buckets at a high level, and list the questions the owner, architect, or GC should answer next.",
-  },
-  {
-    id: "housing-funding",
-    category: "Affordable Housing prompts",
-    role: "Affordable Housing Team",
-    task: "Check funding requirement areas",
-    projectPhase: "Preconstruction",
-    trade: "Affordable Housing Compliance",
-    riskType: "Funding compliance",
-    outputType: "Checklist",
-    experienceLevel: "Intermediate",
-    title: "Check LIHTC / HUD / funding requirement areas",
-    useCase: "Identify issue-spotting questions for housing projects with layered funding.",
-    inputsNeeded: ["Funding type", "State", "Project type", "Scope of work", "Known concerns"],
-    expectedOutput: "Requirement buckets, documents to request, questions to ask, schedule concerns.",
-    workflowSlug: "requirement-radar",
-    prompt: "Review the project details below and identify likely funding and housing requirement areas that should be verified. Separate requirement buckets, documents to request, parties to verify with, schedule and documentation risks, and the next best questions to ask. This is issue spotting only, not a final compliance determination.",
-  },
-  {
     id: "consultant-conflict",
     category: "Consultant prompts",
     role: "Consultant",
@@ -876,16 +815,6 @@ export const TEMPLATES: TemplateDefinition[] = [
     description: "Summarize high-priority scope, budget, schedule, and requirement issues for decision-makers.",
     type: "Report",
     sections: ["Purpose", "Inputs reviewed", "Executive summary", "High-priority risks", "Questions to verify", "Recommended next action"],
-  },
-  {
-    id: "nspire-matrix",
-    category: "Affordable Housing",
-    role: "Affordable Housing Team",
-    trade: "Occupied Rehab",
-    title: "NSPIRE deficiency matrix",
-    description: "Track unit-by-unit deficiencies, trade assignment, priority, occupancy impact, and next steps.",
-    type: "Matrix",
-    sections: ["Unit", "Deficiency", "Trade", "Priority", "Occupied or vacant", "Immediate need or rehab scope", "Questions", "Status"],
   },
   {
     id: "buyout-checklist",
@@ -1223,7 +1152,7 @@ export const TRADE_RISKS: TradeRiskDefinition[] = [
     title: "Accessibility",
     trade: "Accessibility",
     reviewMode: "Accessibility Reviewer",
-    summary: "Use when thresholds, clearances, accessible fixtures, paths, and housing accessibility obligations need issue spotting.",
+    summary: "Use when thresholds, clearances, accessible fixtures, paths, and accessibility obligations need issue spotting.",
     commonMisses: ["Threshold and transition compliance questions", "Clear floor space impacts", "Accessible hardware and mounting heights", "Bathroom accessory layouts", "Route and maneuvering clearance conflicts"],
     badExclusions: ["Field verification excluded", "Accessory scope pushed to owner without clarity", "Patch and finish work excluded"],
     hiddenCosts: ["Rework from missed clearance", "Accessory resets", "Door hardware changes", "Site path upgrades"],
@@ -1257,7 +1186,7 @@ export const TRADE_RISKS: TradeRiskDefinition[] = [
     closeoutItems: ["Unit turnover records", "Resident signoff if applicable", "Closeout punch tracking"],
     bidFormBreakouts: ["Unit pricing", "Occupied premium", "Protection", "Cleaning", "Access coordination", "Turnover duration"],
     suggestedPrompts: ["Plan occupied rehab phasing", "Build resident-impact checklist"],
-    suggestedTemplates: ["NSPIRE deficiency matrix", "Field issue package"],
+    suggestedTemplates: ["Issue matrix", "Field issue package"],
     suggestedChecklist: ["Verify notices", "Verify access windows", "Verify protection", "Verify turnover assumptions"],
   },
 ];
@@ -1270,22 +1199,6 @@ export const REQUIREMENT_BUCKETS: RequirementBucketDefinition[] = [
     questions: ["Is any federal funding involved or possible?", "Do wage, procurement, or reporting rules flow from that funding?", "What deadlines or documentation are tied to the funding source?"],
     documents: ["Funding agreements", "Grant or loan terms", "Procurement requirements", "Reporting forms"],
     verifyWith: ["Owner", "Lender", "Funding agency", "Consultant"],
-  },
-  {
-    id: "hud-nspire",
-    title: "HUD / NSPIRE",
-    summary: "Use when HUD-assisted housing, NSPIRE deficiencies, or inspection-driven rehab scope could control priorities.",
-    questions: ["Is the property HUD-assisted or subject to NSPIRE?", "Are there inspection findings or immediate needs already documented?", "What correction timelines apply?"],
-    documents: ["NSPIRE reports", "HUD correspondence", "Immediate needs lists", "Unit matrices"],
-    verifyWith: ["Owner", "HUD representative", "Property management", "Architect"],
-  },
-  {
-    id: "lihtc",
-    title: "LIHTC / Section 42",
-    summary: "Use when tax-credit requirements, placed-in-service timing, or agency review may affect the project.",
-    questions: ["Is LIHTC involved?", "What state housing agency requirements apply?", "Are placed-in-service or tenant-impact deadlines driving the plan?"],
-    documents: ["Allocation documents", "Agency correspondence", "Project schedule milestones", "Compliance guides"],
-    verifyWith: ["Owner", "State housing finance agency", "Tax credit consultant", "Lender"],
   },
   {
     id: "ahj",
@@ -1345,37 +1258,6 @@ export const REQUIREMENT_BUCKETS: RequirementBucketDefinition[] = [
   },
 ];
 
-export const AFFORDABLE_HOUSING_MODULES: AffordableHousingModuleDefinition[] = [
-  {
-    slug: "nspire",
-    title: "NSPIRE Matrix Builder",
-    description: "Turn inspection findings into a deficiency matrix with trades, priorities, occupied status, and next questions.",
-    inputs: ["NSPIRE report", "Unit matrix", "Occupied or vacant data", "Scope notes", "Trade assignments if known"],
-    outputs: ["Unit-by-unit deficiency matrix", "Trade assignment", "Priority ranking", "Immediate needs versus renovation scope", "Bid package scope items", "Field verification checklist"],
-  },
-  {
-    slug: "pcna",
-    title: "PCNA / CNA Review Assistant",
-    description: "Review capital needs reports for immediate needs, long-term gaps, and missing pricing coverage.",
-    inputs: ["PCNA / CNA report", "Budget if available", "Scope of work", "Project type", "Building age", "Funding type"],
-    outputs: ["Immediate needs", "Short-term needs", "Long-term capital needs", "Missing scope", "Budget risk", "Lender concerns"],
-  },
-  {
-    slug: "funding-checklist",
-    title: "LIHTC / Funding Requirement Checklist",
-    description: "Issue-spot funding-related requirement buckets and questions to verify.",
-    inputs: ["Funding type", "State", "Project type", "Rehab or new construction", "Owner requirements", "Scope of work"],
-    outputs: ["Requirement areas to verify", "Questions for owner", "Questions for architect", "Questions for lender", "Schedule and documentation risks"],
-  },
-  {
-    slug: "occupied-rehab",
-    title: "Occupied Rehab Planner",
-    description: "Plan phasing, access, tenant impact, and sequencing risk for occupied work.",
-    inputs: ["Unit count", "Occupied or vacant units", "Scope by unit", "Work days per unit", "Relocation assumptions", "Inspection requirements", "Long lead materials"],
-    outputs: ["Phasing questions", "Crew flow assumptions", "Tenant impact list", "Critical path risks", "Field coordination checklist"],
-  },
-];
-
 export const QUICK_TOOLS: QuickToolDefinition[] = [
   { slug: "email-cleaner", title: "Construction email cleaner", description: "Rewrite rough notes into a direct construction email.", output: "Email" },
   { slug: "rfi-title", title: "RFI title generator", description: "Generate sharper titles for RFIs from rough issue notes.", output: "RFI title" },
@@ -1408,7 +1290,6 @@ export const CONSULTING_SERVICES = [
   "Budget risk review",
   "Change order support",
   "Requirement issue spotting",
-  "Affordable housing review support",
   "Workflow and playbook setup",
 ];
 

@@ -9,7 +9,6 @@ import { compareBudgetsAction, importBudgetScopeAction } from "./actions";
 
 const PROJECT_TYPES = [
   ["multifamily", "Multifamily"],
-  ["affordable-housing", "Affordable housing"],
   ["commercial", "Commercial"],
   ["tenant-improvement", "Tenant improvement"],
   ["civil", "Civil"],

@@ -10,13 +10,13 @@ describe("Project Brain", () => {
       city: "Example City",
       state: "ST",
       region: "Southwest",
-      projectType: "affordable-housing",
+      projectType: "multifamily",
       assetType: "Multifamily",
       renovationOrNew: "renovation",
       unitCount: 120,
       grossSquareFeet: 96000,
       buildingCount: 4,
-      fundingType: "LIHTC",
+      fundingType: "Private lender",
       currentPhase: "Preconstruction",
     });
     const brain = buildProjectBrain(project, null, generateRiskReview(project));
@@ -35,7 +35,7 @@ describe("Project Brain", () => {
       {
         id: "memory_1",
         projectId: project.id,
-        projectProfileSummary: "Cedar Ridge Apartments; affordable housing.",
+        projectProfileSummary: "Cedar Ridge Apartments; multifamily renovation.",
         knownScopeSummary: "Electrical panels | Devices | Testing",
         pricingMemorySummary: "Panel replacement carried as allowance",
         contractMemorySummary: "Permit responsibility unclear",

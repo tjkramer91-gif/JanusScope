@@ -54,9 +54,9 @@ const GC_NAMES = [
   "Placeholder Buyout Services LLC",
 ];
 const OWNER_NAMES = [
-  "Synthetic Housing Sponsor LLC",
+  "Synthetic Asset Sponsor LLC",
   "Demo Asset Stewardship Group LLC",
-  "Sample Capital Housing Partners LLC",
+  "Sample Capital Stewardship Partners LLC",
   "Placeholder Property Holdings LLC",
 ];
 const ARCHITECT_NAMES = [
@@ -69,7 +69,7 @@ const STREETS = ["Cinder Mesa Drive", "Signal Foundry Avenue", "North Surveyor L
 const CITIES = ["Example City", "Sample Junction", "Demo Crossing", "Placeholder Basin"];
 const TRADES = ["Electrical", "Windows", "Roofing", "Flooring", "Doors and Hardware"];
 const EMAIL_PREFIXES = ["estimating", "pm", "buyout", "ops", "review"];
-const EMAIL_DOMAINS = ["synthetic-builders.example", "demo-housing.example", "placeholder-design.invalid"];
+const EMAIL_DOMAINS = ["synthetic-builders.example", "demo-assets.example", "placeholder-design.invalid"];
 
 export const SYNTHETIC_PRICING_RULES: SyntheticPricingRule[] = [
   { key: "electrical-panel-replacement", label: "Electrical Panel Replacement", unit: "each", basePrice: 1950, maxVariance: 0.16, roundTo: 25 },

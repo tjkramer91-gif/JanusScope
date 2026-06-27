@@ -17,7 +17,6 @@ const projectTypeSchema = z.preprocess(
   (value) => (typeof value === "string" && value.trim() ? value : "commercial"),
   z.enum([
     "multifamily",
-    "affordable-housing",
     "commercial",
     "tenant-improvement",
     "civil",

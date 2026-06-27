@@ -4,7 +4,7 @@ JanusScope is an AI construction education and software platform that helps cons
 
 ## Positioning And Terminology
 
-Use clear, practical construction language. JanusScope is a construction education and workflow software platform powered by AI. It helps owners, developers, general contractors, subcontractors, estimators, project managers, superintendents, affordable housing teams, and consultants review documents, understand scope, organize project risk, and ask better questions.
+Use clear, practical construction language. JanusScope is a construction education and workflow software platform powered by AI. It helps owners, developers, general contractors, subcontractors, estimators, project managers, superintendents, and consultants review documents, understand scope, organize project risk, and ask better questions.
 
 JanusScope is not a data brokerage, public pricing source, estimating replacement, legal review tool, code compliance engine, or replacement for experienced construction professionals.
 
@@ -167,7 +167,7 @@ Before release, confirm:
 - No ICON National references
 - No ICON Builders references
 - No Wilshire Pacific Builders references
-- No April Housing references
+- No banned client references
 - No Belton Woods references
 <!-- sensitive-content-check: allow-end -->
 - No real project names

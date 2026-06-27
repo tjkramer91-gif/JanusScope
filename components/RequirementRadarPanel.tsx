@@ -47,11 +47,11 @@ export function RequirementRadarPanel() {
   const recommendedBuckets = useMemo(() => {
     const lower = Object.values(values).join(" ").toLowerCase();
     return REQUIREMENT_BUCKETS.filter((bucket) => {
-      if (bucket.id === "hud-nspire" || bucket.id === "lihtc" || bucket.id === "resident") {
-        return /(hud|nspire|lihtc|housing|occupied|unit|rad|section 8|home|cdbg)/.test(lower);
+      if (bucket.id === "resident") {
+        return /(occupied|unit|resident|tenant|relocation|access)/.test(lower);
       }
       if (bucket.id === "federal" || bucket.id === "workforce") {
-        return /(federal|hud|lihtc|home|cdbg|davis|bacon|section 3|mbe|wbe)/.test(lower);
+        return /(federal|grant|loan|davis|bacon|prevailing|wage|mbe|wbe)/.test(lower);
       }
       return true;
     });

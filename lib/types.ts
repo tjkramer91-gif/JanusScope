@@ -57,7 +57,6 @@ export type UsageEventType =
 
 export type ProjectType =
   | "multifamily"
-  | "affordable-housing"
   | "commercial"
   | "tenant-improvement"
   | "civil"
