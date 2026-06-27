@@ -3,10 +3,10 @@ import Image from "next/image";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Website Under Construction | Janus Construction Advisory",
+    absolute: "Website Under Construction | Janus Construction Advisory, LLC",
   },
   description:
-    "Janus Construction Advisory is building a practical construction advisory platform focused on scope, cost clarity, project risk, and better decisions.",
+    "Janus Construction Advisory, LLC is building a practical construction advisory platform focused on scope, cost clarity, project risk, and better decisions.",
 };
 
 export default function LandingPage() {
@@ -19,7 +19,7 @@ export default function LandingPage() {
         fill
         priority
         sizes="100vw"
-        src="/images/janus-construction-advisory-hero-v3.png"
+        src="/images/janus-construction-advisory-hero-v6.png"
       />
 
       <div className="absolute inset-0 bg-black/10" />
@@ -30,7 +30,7 @@ export default function LandingPage() {
         <section className="max-w-2xl" aria-labelledby="under-construction-title">
           <p className="flex items-center gap-3 text-xs font-semibold uppercase text-white/75 sm:text-sm">
             <span className="h-px w-10 bg-white/50" aria-hidden="true" />
-            Janus Construction Advisory
+            Janus Construction Advisory, LLC
           </p>
 
           <h1
@@ -41,7 +41,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="mt-6 text-lg font-semibold leading-7 text-white sm:text-xl sm:leading-8">
-            Janus Construction Advisory is currently being built.
+            Janus Construction Advisory, LLC is currently being built.
           </p>
 
           <p className="mt-4 max-w-xl text-sm leading-6 text-white/80 sm:text-base sm:leading-7">
